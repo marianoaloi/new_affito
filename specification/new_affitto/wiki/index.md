@@ -1,0 +1,165 @@
+# Wiki Index
+
+> Auto-generated knowledge base directory
+
+> Note: Text in backticks after page names shows aliases — alternative names, abbreviations, or translations.
+
+## Entities
+
+- [[entities/rtk-query|rtk-query]] `aliases: RTK Query, Redux Toolkit Query` - type: entity
+- [[entities/affitti-frontend-v1|affitti-frontend-v1]] `aliases: Affitti Frontend Web App, Affitti Frontend, Affitti Frontend v1` - type: entity
+- [[entities/mongodb|mongodb]] `aliases: mongoDB, Mongo, MongoDB Atlas` - type: entity
+- [[entities/padova|padova]] `aliases: Padua, Provincia di Padova` - type: entity
+- [[entities/trieste|trieste]] `aliases: Trieste province, Provincia di Trieste` - type: entity
+- [[entities/cluster0-7qska-mongodb-net|cluster0-7qska-mongodb-net]] `aliases: Cluster0, MongoDB Atlas Cluster0` - type: entity
+- [[entities/firebase|firebase]] `aliases: Firebase platform, Firebase Hosting & Functions` - type: entity
+- [[entities/googleauthprovider|googleauthprovider]] `aliases: Google Auth Provider, Google Authentication Provider, GoogleAuthProvider` - type: entity
+- [[entities/udine|udine]] `aliases: DB udine, udine database, MongoDB udine` - type: entity
+- [[entities/count|count]] `aliases: count collection, count` - type: entity
+- [[entities/feature|feature]] `aliases: feature collection` - type: entity
+- [[entities/affitiudine|affitiudine]] `aliases: Firebase project affitiudine, affitiudine project` - type: entity
+- [[entities/affitto_data|affitto_data]] `aliases: affitto_data collection, affitto_data` - type: entity
+- [[entities/affito|affito]] `aliases: affito collection, affitto` - type: entity
+- [[entities/affitti-backend|affitti-backend]] `aliases: Affitti API Layer, Affitti Backend API` - type: entity
+- [[entities/firebase-cloud-functions|firebase-cloud-functions]] `aliases: Cloud Functions, Firebase Functions, GCF` - type: entity
+- [[entities/mongodb-atlas|mongodb-atlas]] `aliases: Atlas, MongoDB Atlas Cloud` - type: entity
+
+## Concepts
+
+- [[concepts/firebase-analytics|firebase-analytics]] `aliases: Firebase Analytics Proposal, FA observability` - type: concept
+- [[concepts/non-functional-requirements|non-functional-requirements]] `aliases: NFRs, Non-Functional Requirements Affitti Frontend` - type: concept
+- [[concepts/milestones|milestones]] `aliases: Development Phases, Delivery Milestones, M1–M5` - type: concept
+- [[concepts/eventual-consistency-frontend-handling|eventual-consistency-frontend-handling]] `aliases: Read-after-write gap, Eventual Consistency (Frontend), Frontend Read-after-Write Lag` - type: concept
+- [[concepts/placeholder-pages|placeholder-pages]] `aliases: Coming Soon Pages, Stub Pages, In Arrivo Pages` - type: concept
+- [[concepts/google-sign-in-flow|google-sign-in-flow]] `aliases: Google popup/redirect flow, Google authentication flow, Google Sign-In` - type: concept
+- [[concepts/slim-dto-alignment|slim-dto-alignment]] `aliases: DTO Alignment Task, Slim DTO Flattening, R2 DTO Alignment` - type: concept
+- [[concepts/column-sorting|column-sorting]] `aliases: Column Sort, FR-8 Column Sorting, table column sorting` - type: concept
+- [[concepts/filter-bar|filter-bar]] `aliases: Filter Bar, filter bar component, listings filter bar` - type: concept
+- [[concepts/null-safe-rendering|null-safe-rendering]] `aliases: Null-safe Rendering, FR-10 Null-safe Rendering, null-safe cell rendering` - type: concept
+- [[concepts/pagination|pagination]] `aliases: Pagination, table pagination, FR-7 Pagination` - type: concept
+- [[concepts/description-editor|description-editor]] `aliases: Description Editor, FR-19 Edit Description, Edit Description Modal` - type: concept
+- [[concepts/public-stats-summary-endpoint|public-stats-summary-endpoint]] `aliases: GET /public/stats/summary, public stats summary endpoint, stats summary API` - type: concept
+- [[concepts/statemaloi-badge-rendering|statemaloi-badge-rendering]] `aliases: stateMaloi badge, stateMaloi column, state badge rendering` - type: concept
+- [[concepts/bulk-state-update-frontend|bulk-state-update-frontend]] `aliases: Bulk State Update, bulk-state action, FR-18 Bulk State` - type: concept
+- [[concepts/session-overlay|session-overlay]] `aliases: Decisions Overlay, Read-after-write overlay, Session Overlay` - type: concept
+- [[concepts/redux-state-slices|redux-state-slices]] `aliases: Redux slices, Redux state slices, state slices` - type: concept
+- [[concepts/route-guard|route-guard]] `aliases: Route Guard, auth route guard, navigation guard, Auth Guard` - type: concept
+- [[concepts/redux|redux]] `aliases: Redux, Redux state, Redux state management` - type: concept
+- [[concepts/affito-collection-query|affito-collection-query]] `aliases: affito aggregation pipeline, affito query, affito collection aggregation` - type: concept
+- [[concepts/province|province]] `aliases: province field, provincia, province dimension` - type: concept
+- [[concepts/realestate|realestate]] `aliases: realEstate object, realEstate projection, realEstate DTO` - type: concept
+- [[concepts/type|type]] `aliases: type field, property type field, type classification attribute` - type: concept
+- [[concepts/powerproperties|powerproperties]] `aliases: powerproperties field, powerproperties property, powerproperties` - type: concept
+- [[concepts/deleted|deleted]] `aliases: soft delete flag, deleted field, deleted marker` - type: concept
+- [[concepts/formati-dati|formati-dati]] `aliases: Data Formats, Formati dei Dati` - type: concept
+- [[concepts/analisi|analisi]] `aliases: Analysis feature, Analisi feature` - type: concept
+- [[concepts/count-collection-view|count-collection-view]] `aliases: count view, count collection view, vista count` - type: concept
+- [[concepts/prende-affitti|prende-affitti]] `aliases: Get Rentals, Prende Affitti feature` - type: concept
+- [[concepts/contattore|contattore]] `aliases: Counter, Count View, Contattore feature` - type: concept
+- [[concepts/title|title]] `aliases: titolo, Title column, listing title` - type: concept
+- [[concepts/energy_class|energy_class]] `aliases: classe energetica, energy class, energy_class field` - type: concept
+- [[concepts/login|login]] `aliases: autenticazione, authentication login, user login` - type: concept
+- [[concepts/react|react]] `aliases: React, React.js, React library` - type: concept
+- [[concepts/typescript|typescript]] `aliases: TypeScript, TS, typescript language` - type: concept
+- [[concepts/certificatepath|certificatepath]] `aliases: X509 certificate path, certificatePath parameter, certificate path` - type: concept
+- [[concepts/table|table]] `aliases: main column table, data table, rental table` - type: concept
+- [[concepts/function|function]] `aliases: Firebase Cloud Functions, Cloud Functions` - type: concept
+- [[concepts/redux-state|redux-state]] `aliases: REDUX state, Redux store, Redux client state` - type: concept
+- [[concepts/business-rules|business-rules]] `aliases: business logic, regole business, business rules layer` - type: concept
+- [[concepts/hosting|hosting]] `aliases: Firebase Hosting, hosting service` - type: concept
+- [[concepts/tag|tag]] `aliases: photo tag, tag field, tag object` - type: concept
+- [[concepts/nation|nation]] `aliases: nation object, nazione, nation sub-object` - type: concept
+- [[concepts/microzone|microzone]] `aliases: microzona, microzone field, microzone property` - type: concept
+- [[concepts/macrozone|macrozone]] `aliases: macrozona, macrozone field, macrozoneId` - type: concept
+- [[concepts/tabella-colonne|tabella-colonne]] `aliases: Table Columns, Data Table Schema, Tabella Colonne` - type: concept
+- [[concepts/count-without-autentication|count-without-autentication]] `aliases: Count Without Authentication, Unauthenticated Count, count without autentication` - type: concept
+- [[concepts/bankguarantee|bankguarantee]] `aliases: bankGuarantee field, garanzia bancaria, bank guarantee property` - type: concept
+- [[concepts/heatingexpenses|heatingexpenses]] `aliases: heatingExpenses field, spese riscaldamento, heating expenses` - type: concept
+- [[concepts/marker|marker]] `aliases: map marker, marker field, marker string` - type: concept
+- [[concepts/senza-autenticazioni-page|senza-autenticazioni-page]] `aliases: Unauthenticated Page, No Auth Page, Senza Autenticazioni Page, Senza Autenticazione Page` - type: concept
+- [[concepts/firebaseconfig|firebaseconfig]] `aliases: Firebase Configuration, Firebase Config Object, firebaseConfig object` - type: concept
+- [[concepts/senza-scelta-page|senza-scelta-page]] `aliases: No Choice Page, Senza Scelta, pagina senza scelta` - type: concept
+- [[concepts/videos|videos]] `aliases: videos array, video listings, videos field` - type: concept
+- [[concepts/tabella-page|tabella-page]] `aliases: Table Page, Tabella Page, pagina tabella` - type: concept
+- [[concepts/analisi-page|analisi-page]] `aliases: Analysis Page, Pagina Analisi` - type: concept
+- [[concepts/mappa-page|mappa-page]] `aliases: Map Page, Mappa` - type: concept
+- [[concepts/photoplan|photoplan]] `aliases: photo plan, photoPlan field, photoPlan array` - type: concept
+- [[concepts/documents|documents]] `aliases: documents array, multimedia documents, documents field` - type: concept
+- [[concepts/airconditioning|airconditioning]] `aliases: airConditioning field, aria condizionata, air conditioning property` - type: concept
+- [[concepts/autenticazione-necessaria|autenticazione-necessaria]] `aliases: Required Authentication, Firebase Login, Autenticazione Necessaria` - type: concept
+- [[concepts/photos|photos]] `aliases: photos array, photo gallery, photos field` - type: concept
+- [[concepts/web-scraping-pipeline|web-scraping-pipeline]] `aliases: scrapping, data scraping, web scraping pipeline` - type: concept
+- [[concepts/elevator-accessibility-tracking|elevator-accessibility-tracking]] `aliases: elevator metrics, disability access tracking, accessibility tracking fields` - type: concept
+- [[concepts/$in-operator|$in-operator]] `aliases: MongoDB $in, $in query operator, $in` - type: concept
+- [[concepts/condominiumexpenses|condominiumexpenses]] `aliases: spese condominiali, condominium fees, condominiumExpenses field` - type: concept
+- [[concepts/$set-operator|$set-operator]] `aliases: MongoDB $set, $set update operator` - type: concept
+- [[concepts/updatemany|updatemany]] `aliases: MongoDB updateMany, bulk update query` - type: concept
+- [[concepts/updateone|updateone]] `aliases: MongoDB updateOne, single document update` - type: concept
+- [[concepts/caption|caption]] `aliases: caption field, caption string, caption property` - type: concept
+- [[concepts/typescript-business-rules|typescript-business-rules]] `aliases: TypeScript API rules, regole business TypeScript, TS business rules` - type: concept
+- [[concepts/emptychoise|emptychoise]] `aliases: empty choice count, emptyChoise field, emptyChoise` - type: concept
+- [[concepts/virtualtours|virtualtours]] `aliases: tour virtuali, virtual tours array, virtualTours field` - type: concept
+- [[concepts/surfacevalue|surfacevalue]] `aliases: surfaceValue field, surface value, surfaceValue` - type: concept
+- [[concepts/floorplans|floorplans]] `aliases: planimetrie, floorplans array, floor plans` - type: concept
+- [[concepts/photo|photo]] `aliases: property photo, foto proprietà, photo object` - type: concept
+- [[concepts/properties|properties]] `aliases: properties object, properties field, listing properties` - type: concept
+- [[concepts/disable|disable]] `aliases: disability access, accessibilità disabili, disable field` - type: concept
+- [[concepts/acceptdenywait|acceptdenywait]] `aliases: decision states aggregation, accept/deny/wait counters, stati decisione aggregati, accept/deny/wait classification` - type: concept
+- [[concepts/prd|prd]] `aliases: Product Requirements Document, PRD document, PRD` - type: concept
+- [[concepts/elevator|elevator]] `aliases: ascensore, lift, elevator field` - type: concept
+- [[concepts/garage|garage]] `aliases: parking, parcheggio, garage field` - type: concept
+- [[concepts/availability|availability]] `aliases: property availability, disponibilità, availability field` - type: concept
+- [[concepts/json-schema|json-schema]] `aliases: JSON Schema 2020-12, JSON Schema draft 2020-12` - type: concept
+- [[concepts/floor|floor]] `aliases: piano, property floor data, floor object` - type: concept
+- [[concepts/contractvalue|contractvalue]] `aliases: contractValue field, contract type value, contractValue` - type: concept
+- [[concepts/description-update|description-update]] `aliases: description write operation, description update operation` - type: concept
+- [[concepts/loweredprice|loweredprice]] `aliases: loweredPrice object, price reduction tracking, prezzo ribassato` - type: concept
+- [[concepts/buildingperformance|buildingperformance]] `aliases: buildingPerformance object, energy building performance, prestazioni edificio` - type: concept
+- [[concepts/price|price]] `aliases: prezzo, property price, price object` - type: concept
+- [[concepts/rent|rent]] `aliases: rent object, rental terms, rent sub-object` - type: concept
+- [[concepts/province-filter|province-filter]] `aliases: provinzia filter, province filtering, geographic filter` - type: concept
+- [[concepts/data-aggregation|data-aggregation]] `aliases: MongoDB aggregation, Data aggregation pipeline, Aggregation` - type: concept
+- [[concepts/surfaceconstitution|surfaceconstitution]] `aliases: surfaceConstitution object, surface constitution elements, composizione superfici` - type: concept
+- [[concepts/costs|costs]] `aliases: costs object, rental costs, costs sub-object` - type: concept
+- [[concepts/multimedia|multimedia]] `aliases: multimedia object, multimedia sub-object, listing media assets` - type: concept
+- [[concepts/web-scraping|web-scraping]] `aliases: Web scraping, scrapping, data scraping` - type: concept
+- [[concepts/energy|energy]] `aliases: energy object, energy class, energy certification` - type: concept
+- [[concepts/userupdate|userupdate]] `aliases: userUpdate field, userUpdate, last modifier email` - type: concept
+- [[concepts/location|location]] `aliases: location object, property location, location sub-object` - type: concept
+- [[concepts/realestatepage|realestatepage]] `aliases: realEstatePage object, real estate page, realEstatePage` - type: concept
+- [[concepts/mlastupdate|mlastupdate]] `aliases: last update timestamp, mLastUpdate field, mLastUpdate` - type: concept
+- [[concepts/react-and-redux-frontend|react-and-redux-frontend]] `aliases: React/Redux UI, React Redux frontend, affitiudine frontend` - type: concept
+- [[concepts/featurelist|featurelist]] `aliases: featureList object, feature list, featureList` - type: concept
+- [[concepts/primaryfeatures|primaryfeatures]] `aliases: Primary Features, primaryFeatures object` - type: concept
+- [[concepts/bulkstatemaloi|bulkstatemaloi]] `aliases: Bulk State Update, BulkStateMaloi operation` - type: concept
+- [[concepts/external-aggregation-process|external-aggregation-process]] `aliases: External aggregation, External refresh process` - type: concept
+- [[concepts/id-typing-validation|id-typing-validation]] `aliases: BR-6 Id typing, BR-6, Id typing rule` - type: concept
+- [[concepts/feature-analysis|feature-analysis]] `aliases: FR-7 feature analysis view, Feature analysis view, FR-7` - type: concept
+- [[concepts/shared-types-package|shared-types-package]] `aliases: Shared TS types, Shared types, TS types package` - type: concept
+- [[concepts/cold-start|cold-start]] `aliases: Cold start problem, Function cold start, Cold boot` - type: concept
+- [[concepts/evaluator|evaluator]] `aliases: Primary user persona, Authenticated reviewer, Evaluator (Frontend Persona)` - type: concept
+- [[concepts/split-collection-architecture|split-collection-architecture]] `aliases: Read-write collection split, Split-collection pattern` - type: concept
+- [[concepts/optimistic-update|optimistic-update]] `aliases: Optimistic UI update, Optimistic update pattern, Optimistic updates` - type: concept
+- [[concepts/firebase-id-token-verification|firebase-id-token-verification]] `aliases: Token verification middleware, Firebase token verification, Firebase ID token auth` - type: concept
+- [[concepts/cors|cors]] `aliases: Cross-Origin Resource Sharing, CORS policy, CORS restriction` - type: concept
+- [[concepts/audit-trail|audit-trail]] `aliases: BR-2, Audit trail rule, BR-2 Audit trail` - type: concept
+- [[concepts/write-whitelist|write-whitelist]] `aliases: BR-5, Write whitelist rule, Field write whitelist` - type: concept
+- [[concepts/rate-limiting|rate-limiting]] `aliases: Rate limit, IP-based rate limiting, Per-IP rate limiting` - type: concept
+- [[concepts/eventual-consistency|eventual-consistency]] `aliases: Eventual consistency model, EC` - type: concept
+- [[concepts/bulk-state-update|bulk-state-update]] `aliases: bulk-state, FR-5` - type: concept
+- [[concepts/x-509-certificate-authentication|x-509-certificate-authentication]] `aliases: X.509 auth, X.509 certificate auth, mutual TLS authentication` - type: concept
+- [[concepts/slim-dto|slim-dto]] `aliases: Data Transfer Object, DTO` - type: concept
+- [[concepts/data-normalization|data-normalization]] `aliases: BR-4 normalization, BSON data normalization, Data normalization, Data normalization (BR-4)` - type: concept
+- [[concepts/soft-delete|soft-delete]] `aliases: Soft deletion, Logical delete` - type: concept
+- [[concepts/statemaloi|statemaloi]] `aliases: stateMaloi enum, state maloi` - type: concept
+- [[concepts/read-after-write-consistency|read-after-write-consistency]] `aliases: Read-after-write gap, RAW consistency` - type: concept
+- [[concepts/firebase-authentication|firebase-authentication]] `aliases: Firebase Auth, Firebase Authentication with Google Provider, Firebase Authentication, Firebase authentication with Google provider, firebase autentication` - type: concept
+
+## Sources
+
+- [[sources/prd_affitti_frontend_v0-2_aa5d28|prd_affitti_frontend_v0-2_aa5d28]] `aliases: Affitti Frontend PRD v0.2, PRD Affitti Frontend v1`
+- [[sources/function_64f05b|function_64f05b]] `aliases: Affitti Feature Specs, function.md`
+- [[sources/new-affitto_840b29|new-affitto_840b29]] `aliases: New Affitto, Affitti System Architecture`
+- [[sources/prd-new-affito-frontend-table_a86812|prd-new-affito-frontend-table_a86812]] `aliases: PRD Affito Frontend Table, Affito Frontend PRD`
+- [[sources/prd-new-affitto-backend_86705a|prd-new-affitto-backend_86705a]] `aliases: Affitti PRD Backend, PRD Affitto Internal Rental System`
+- [[sources/prd_affitti_backend_v0-3_1d90fc|prd_affitti_backend_v0-3_1d90fc]] `aliases: Affitti Backend PRD v0.3, PRD Affitti API Layer`
