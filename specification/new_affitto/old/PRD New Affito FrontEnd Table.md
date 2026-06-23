@@ -6,7 +6,6 @@ informacione del projeto frondend per acessare il firebase autentication.
 ```
 const googleProvider = new GoogleAuthProvider();
 const firebaseConfig = {
-  apiKey: "AIzaSyAokzUuGqYXFc4YfJj66vC3aVPsQ7P2ixE",
   authDomain: "affitiudine.firebaseapp.com",
   projectId: "affitiudine",
   storageBucket: "affitiudine.firebasestorage.app",

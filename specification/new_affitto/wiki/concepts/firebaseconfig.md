@@ -19,7 +19,6 @@ The `firebaseConfig` is a JavaScript configuration object used to initialize the
 ## Key Characteristics
 
 - **Project-specific binding**: The configuration ties the frontend application to the specific Firebase project named "affitiudine" via its `projectId` and `authDomain` (`affitiudine.firebaseapp.com`)
-- **Contains sensitive credentials**: Includes the `apiKey` (`AIzaSyAokzUuGqYXFc4YfJj66vC3aVPsQ7P2ixE`) used for API access authorization, though Firebase API keys are designed to be client-facing and are restricted via Firebase security rules
 - **Enables Firebase Authentication**: Works in conjunction with [[entities/GoogleAuthProvider|GoogleAuthProvider]] to enable Google-based sign-in for the application
 - **Messaging support**: Includes `messagingSenderId` (`211362755894`) for Firebase Cloud Messaging integration
 - **Storage configuration**: Specifies `storageBucket` (`affitiudine.firebasestorage.app`) for Firebase Storage access
@@ -50,7 +49,6 @@ The `firebaseConfig` is a JavaScript configuration object used to initialize the
 > ```
 > const googleProvider = new GoogleAuthProvider();
 > const firebaseConfig = {
->   apiKey: "AIzaSyAokzUuGqYXFc4YfJj66vC3aVPsQ7P2ixE",
 >   authDomain: "affitiudine.firebaseapp.com",
 >   projectId: "affitiudine",
 >   storageBucket: "affitiudine.firebasestorage.app",
