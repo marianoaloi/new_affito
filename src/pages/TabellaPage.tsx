@@ -13,6 +13,15 @@ import BulkActionBar from '../components/listings/BulkActionBar';
 import ListingRow from '../components/listings/ListingRow';
 import DescriptionModal from '../components/listings/DescriptionModal';
 import type { ListingsQuery } from '../types';
+import {
+  PageWrapper,
+  ErrorBox,
+  TableWrap,
+  StyledTable,
+  EmptyCell,
+  Pagination,
+  SkeletonCell,
+} from './TabellaPage.styled';
 
 interface ModalState {
   id: number;
@@ -31,6 +40,9 @@ export default function TabellaPage() {
     province: filters.province || undefined,
     type: filters.type || undefined,
     stateMaloi: filters.stateMaloi || undefined,
+    accessibility: filters.accessibility || undefined,
+    elevator: filters.elevator || undefined,
+    terra: filters.terra ? 'true' : undefined,
     sortField: filters.sortField || undefined,
     sortOrder: filters.sortField ? filters.sortOrder : undefined,
   };
@@ -51,21 +63,21 @@ export default function TabellaPage() {
   };
 
   return (
-    <main className="page">
+    <PageWrapper>
       <h1>Tabella affitti</h1>
       <FilterBar />
       <BulkActionBar />
 
       {isError ? (
-        <div className="error-box">
+        <ErrorBox>
           Errore nel caricamento.
           <button className="btn btn-secondary" onClick={() => void refetch()}>
             Riprova
           </button>
-        </div>
+        </ErrorBox>
       ) : (
-        <div className="table-wrap">
-          <table className="table">
+        <TableWrap>
+          <StyledTable>
             <thead>
               <tr>
                 <th>
@@ -88,10 +100,10 @@ export default function TabellaPage() {
             <tbody>
               {isLoading
                 ? Array.from({ length: filters.limit }).map((_, i) => (
-                    <tr key={`skeleton-${i}`} className="skeleton-row">
+                    <tr key={`skeleton-${i}`}>
                       {Array.from({ length: 8 }).map((__, j) => (
                         <td key={j}>
-                          <div className="skeleton" />
+                          <SkeletonCell />
                         </td>
                       ))}
                     </tr>
@@ -105,18 +117,16 @@ export default function TabellaPage() {
                   ))}
               {!isLoading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="empty-cell">
-                    Nessun risultato
-                  </td>
+                  <EmptyCell colSpan={8}>Nessun risultato</EmptyCell>
                 </tr>
               )}
             </tbody>
-          </table>
-        </div>
+          </StyledTable>
+        </TableWrap>
       )}
 
       {!isError && totalPages > 1 && (
-        <div className="pagination">
+        <Pagination>
           <button
             className="btn btn-secondary"
             disabled={currentPage <= 1 || isFetching}
@@ -124,9 +134,7 @@ export default function TabellaPage() {
           >
             Precedente
           </button>
-          <span className="pagination-info">
-            Pagina {currentPage} di {totalPages}
-          </span>
+          <span>{`Pagina ${currentPage} di ${totalPages}`}</span>
           <button
             className="btn btn-secondary"
             disabled={currentPage >= totalPages || isFetching}
@@ -134,7 +142,7 @@ export default function TabellaPage() {
           >
             Successiva
           </button>
-        </div>
+        </Pagination>
       )}
 
       {modal && (
@@ -144,6 +152,6 @@ export default function TabellaPage() {
           onClose={() => setModal(null)}
         />
       )}
-    </main>
+    </PageWrapper>
   );
 }

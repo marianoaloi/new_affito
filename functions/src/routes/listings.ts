@@ -18,8 +18,12 @@ const PROJECTION = {
   mLastUpdate: 1,
   'feature.province': 1,
   'feature.type': 1,
+  'feature.featureList.elevator': 1,
+  'feature.primaryFeatures.Accesso_per_disabili': 1,
   'properties.surfaceValue': 1,
   'properties.energy.class.name': 1,
+  'properties.elevator': 1,
+  'properties.floor': 1,
   'realEstatePage.title': 1,
   'realEstatePage.contractValue': 1,
   'realEstatePage.price.value': 1,
@@ -46,6 +50,12 @@ function toDTO(doc: Document): ListingDTO {
     stateMaloi: doc.stateMaloi,
     description: doc.description,
     mLastUpdate: doc.mLastUpdate,
+    floor: doc.properties?.floor
+      ? { abbreviation: doc.properties.floor.abbreviation ?? null, value: doc.properties.floor.value }
+      : undefined,
+    elevator: doc.properties?.elevator,
+    featureElevator: doc.feature?.featureList?.elevator,
+    accessibility: doc.feature?.primaryFeatures?.Accesso_per_disabili ?? null,
   };
 }
 
@@ -61,17 +71,39 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       100,
       Math.max(1, parseInt(String(req.query.limit ?? '20'), 10) || 20)
     );
-    const { province, type, stateMaloi, sortField, sortOrder } = req.query;
+    const { province, type, stateMaloi, sortField, sortOrder, accessibility, elevator, terra } = req.query;
 
-    const filter: Filter<Document> = {};
-    if (province && typeof province === 'string') filter['feature.province'] = province;
-    if (type && typeof type === 'string') filter['feature.type'] = type;
+    const andClauses: Filter<Document>[] = [];
+    if (province && typeof province === 'string') andClauses.push({ 'feature.province': province });
+    if (type && typeof type === 'string') andClauses.push({ 'feature.type': type });
 
     if (stateMaloi === '0' || stateMaloi === '1' || stateMaloi === '2') {
-      filter.stateMaloi = parseInt(stateMaloi, 10);
+      andClauses.push({ stateMaloi: parseInt(stateMaloi, 10) });
     } else if (stateMaloi === 'empty') {
-      filter.$or = [{ stateMaloi: { $exists: false } }, { stateMaloi: null }];
+      andClauses.push({ $or: [{ stateMaloi: { $exists: false } }, { stateMaloi: null }] });
     }
+
+    if (accessibility === 'accessible') {
+      andClauses.push({ 'feature.primaryFeatures.Accesso_per_disabili': 1 });
+    } else if (accessibility === 'not_accessible') {
+      andClauses.push({ 'feature.primaryFeatures.Accesso_per_disabili': 0 });
+    } else if (accessibility === 'no_info') {
+      andClauses.push({ $or: [{ 'feature.primaryFeatures.Accesso_per_disabili': null }, { 'feature.primaryFeatures.Accesso_per_disabili': { $exists: false } }] });
+    }
+
+    if (elevator === 'has') {
+      andClauses.push({ 'properties.elevator': true });
+    } else if (elevator === 'no') {
+      andClauses.push({ 'properties.elevator': false });
+    } else if (elevator === 'no_info') {
+      andClauses.push({ $or: [{ 'properties.elevator': null }, { 'properties.elevator': { $exists: false } }] });
+    }
+
+    if (terra === 'true') {
+      andClauses.push({ 'properties.floor.abbreviation': /t/i });
+    }
+
+    const filter: Filter<Document> = andClauses.length > 0 ? { $and: andClauses } : {};
 
     const sort: Record<string, 1 | -1> = {};
     const order: 1 | -1 = sortOrder === 'asc' ? 1 : -1;

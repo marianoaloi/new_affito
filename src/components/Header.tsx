@@ -29,6 +29,12 @@ export default function Header() {
       <Link to="/" className="header-title">
         Affitti Udine
       </Link>
+      {isAuthenticated && (
+        <nav className="header-nav">
+          <Link to="/tabella" className="nav-link">Tabella</Link>
+          <Link to="/mappa" className="nav-link">Mappa</Link>
+        </nav>
+      )}
       <div className="header-auth">
         {isAuthenticated && user ? (
           <div className="dropdown" ref={dropdownRef}>

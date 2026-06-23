@@ -42,11 +42,13 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const auth_1 = require("./middleware/auth");
 const listings_1 = __importDefault(require("./routes/listings"));
+const map_1 = __importDefault(require("./routes/map"));
 const public_1 = __importDefault(require("./routes/public"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({ origin: true }));
 app.use(express_1.default.json());
 app.use('/public', public_1.default);
+app.use('/listings/map', auth_1.authMiddleware, map_1.default);
 app.use('/listings', auth_1.authMiddleware, listings_1.default);
 exports.api = functions.https.onRequest(app);
 //# sourceMappingURL=index.js.map

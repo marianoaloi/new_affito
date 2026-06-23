@@ -1,10 +1,14 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
+import type { AccessibilityFilter, ElevatorFilter } from '../map/mapSlice';
 
 export interface ListingsFilters {
   province: string;
   type: string;
   stateMaloi: string;
+  accessibility: AccessibilityFilter;
+  elevator: ElevatorFilter;
+  terra: boolean;
   page: number;
   limit: number;
   sortField: string;
@@ -20,6 +24,9 @@ const initialFilters: ListingsFilters = {
   province: '',
   type: '',
   stateMaloi: '',
+  accessibility: '',
+  elevator: '',
+  terra: false,
   page: 1,
   limit: 20,
   sortField: '',
@@ -37,10 +44,10 @@ const listingsSlice = createSlice({
   reducers: {
     setFilter(
       state,
-      action: PayloadAction<{ key: keyof ListingsFilters; value: string | number }>
+      action: PayloadAction<{ key: keyof ListingsFilters; value: string | number | boolean }>
     ) {
       const { key, value } = action.payload;
-      (state.filters[key] as string | number) = value;
+      (state.filters[key] as string | number | boolean) = value;
       if (key !== 'page') state.filters.page = 1;
     },
     resetFilters(state) {

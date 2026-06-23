@@ -13,6 +13,10 @@ export interface ListingDTO {
   stateMaloi?: StateMaloi;
   description?: string;
   mLastUpdate?: number;
+  floor?: { abbreviation?: string | null; value?: string };
+  elevator?: boolean;
+  featureElevator?: string;
+  accessibility?: number | null;
 }
 
 export interface ListingsQuery {
@@ -23,6 +27,9 @@ export interface ListingsQuery {
   stateMaloi?: string;
   sortField?: string;
   sortOrder?: 'asc' | 'desc';
+  accessibility?: string;
+  elevator?: string;
+  terra?: string;
 }
 
 export interface ListingsResponse {
@@ -53,4 +60,37 @@ export interface SummaryResponse {
     wait: number;
     emptyChoise: number;
   };
+}
+
+export interface MapListingPhoto {
+  small: string;
+  large: string;
+}
+
+export interface MapListingDTO {
+  id: number;
+  title: string;
+  price: number;
+  priceFormatted: string;
+  contractValue: string;
+  province: string;
+  type: string;
+  stateMaloi?: 0 | 1 | 2;
+  description?: string;
+  mLastUpdate?: number;
+  createdAt: number;
+  updatedAt: number;
+  location: {
+    latitude: number | null;
+    longitude: number | null;
+    address?: string | null;
+    province: string;
+  };
+  floor?: { abbreviation?: string | null; value?: string };
+  surfaceValue?: string;
+  elevator?: boolean;
+  featureElevator?: string;
+  accessibility?: number | null;
+  elevation?: number | null;
+  photos: MapListingPhoto[];
 }

@@ -1,44 +1,41 @@
-import { Link } from 'react-router-dom';
 import { useAuth } from '../features/auth/useAuth';
 import { useGetSummaryQuery } from '../features/stats/statsApi';
 import SummaryCards from '../components/stats/SummaryCards';
+import { PageWrapper, HeroSection, StatsSection, ErrorBox, Spinner } from './LandingPage.styled';
 
 export default function LandingPage() {
   const { user, isAuthenticated, signIn } = useAuth();
   const { data, isLoading, isError, refetch } = useGetSummaryQuery();
 
   return (
-    <main className="page">
+    <PageWrapper>
       {isAuthenticated ? (
-        <section className="hero">
+        <HeroSection>
           <h1>Benvenuto {user?.displayName ?? user?.email ?? ''}</h1>
-          <Link to="/tabella" className="btn btn-primary btn-lg">
-            Vai alla tabella
-          </Link>
-        </section>
+        </HeroSection>
       ) : (
-        <section className="hero">
+        <HeroSection>
           <h1>Affitti Udine</h1>
           <p>Accedi per gestire gli annunci.</p>
           <button className="btn btn-primary btn-lg" onClick={() => void signIn()}>
             Accedi con Google
           </button>
-        </section>
+        </HeroSection>
       )}
 
-      <section className="stats-section">
+      <StatsSection>
         <h2>Statistiche</h2>
-        {isLoading && <div className="spinner" />}
+        {isLoading && <Spinner />}
         {isError && (
-          <div className="error-box">
+          <ErrorBox>
             Errore nel caricamento delle statistiche.
             <button className="btn btn-secondary" onClick={() => void refetch()}>
               Riprova
             </button>
-          </div>
+          </ErrorBox>
         )}
         {data && <SummaryCards data={data} />}
-      </section>
-    </main>
+      </StatsSection>
+    </PageWrapper>
   );
 }

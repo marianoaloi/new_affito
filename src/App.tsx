@@ -5,6 +5,7 @@ import Toasts from './components/Toasts';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import TabellaPage from './pages/TabellaPage';
+import MapPage from './pages/MapPage';
 import PlaceholderPage from './pages/PlaceholderPage';
 
 export default function App() {
@@ -28,7 +29,7 @@ export default function App() {
           path="/mappa"
           element={
             <ProtectedRoute>
-              <PlaceholderPage title="Mappa" />
+              <MapPage />
             </ProtectedRoute>
           }
         />
