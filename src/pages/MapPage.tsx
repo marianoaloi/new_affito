@@ -3,16 +3,27 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { useLazyGetMapListingsQuery } from '../features/map/mapApi';
 import {
   selectFilteredListings,
-  selectMapFilters,
   setAllListings,
   setError,
   setLoading,
   selectMapLoading,
   selectMapError,
 } from '../features/map/mapSlice';
-import MapFilters from '../components/map/MapFilters';
+import { selectSharedFilters } from '../features/shared/filtersSlice';
 import MapView from '../components/map/MapView';
-import { MapPageWrapper, MapStatus, MapContent, LoadingOverlay } from './MapPage.styled';
+import {
+  MapPageWrapper,
+  MapContainer,
+  LegendOverlay,
+  LegendTitle,
+  LegendItem,
+  LegendDot,
+  LegendDivider,
+  LegendCount,
+  CounterOverlay,
+  LoadingOverlay,
+  ErrorOverlay,
+} from './MapPage.styled';
 
 const PROVINCE_CENTERS: Record<string, { lat: number; lng: number; zoom: number }> = {
   Udine: { lat: 46.0689, lng: 13.2224, zoom: 13 },
@@ -20,9 +31,12 @@ const PROVINCE_CENTERS: Record<string, { lat: number; lng: number; zoom: number 
   Padova: { lat: 45.4064, lng: 11.8768, zoom: 13 },
 };
 
+const RENT_COLOR = '#28528C';
+const SALE_COLOR = '#A9683A';
+
 export default function MapPage() {
   const dispatch = useAppDispatch();
-  const filters = useAppSelector(selectMapFilters);
+  const sharedFilters = useAppSelector(selectSharedFilters);
   const filteredListings = useAppSelector(selectFilteredListings);
   const loading = useAppSelector(selectMapLoading);
   const error = useAppSelector(selectMapError);
@@ -30,25 +44,21 @@ export default function MapPage() {
 
   const [trigger] = useLazyGetMapListingsQuery();
 
-  const fetchListings = useCallback(
-    async (override?: { province?: string; type?: string }): Promise<void> => {
-      dispatch(setLoading(true));
-      try {
-        const province = override?.province ?? filters.province;
-        const type = override?.type ?? filters.type;
-        const data = await trigger({ province, type: type || undefined }).unwrap();
-        dispatch(setAllListings(data));
-      } catch {
-        dispatch(setError('Errore nel caricamento degli annunci'));
-      }
-    },
-    [dispatch, trigger, filters.province, filters.type]
-  );
+  const fetchListings = useCallback(async (): Promise<void> => {
+    dispatch(setLoading(true));
+    try {
+      const province = sharedFilters.province || 'Udine';
+      const type = sharedFilters.deal || undefined;
+      const data = await trigger({ province, type }).unwrap();
+      dispatch(setAllListings(data));
+    } catch {
+      dispatch(setError('Errore nel caricamento degli annunci'));
+    }
+  }, [dispatch, trigger, sharedFilters.province, sharedFilters.deal]);
 
   useEffect(() => {
     fetchListings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sharedFilters.province, sharedFilters.deal]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -59,33 +69,46 @@ export default function MapPage() {
   }, []);
 
   const center = useMemo(() => {
-    return PROVINCE_CENTERS[filters.province] ?? PROVINCE_CENTERS.Udine;
-  }, [filters.province]);
+    return PROVINCE_CENTERS[sharedFilters.province] ?? PROVINCE_CENTERS.Udine;
+  }, [sharedFilters.province]);
 
   return (
     <MapPageWrapper>
-      <MapFilters onProvinceTypeChange={(override) => fetchListings(override)} />
-      <MapStatus>
-        {error ? (
-          <span>
-            {error}{' '}
-            <button className="btn-sm" onClick={() => fetchListings()}>
-              Riprova
-            </button>
-          </span>
-        ) : (
-          `${filteredListings.length} annunci visibili`
-        )}
-      </MapStatus>
-      <MapContent>
-        {loading && <LoadingOverlay>Caricamento...</LoadingOverlay>}
+      <MapContainer>
         <MapView
           listings={filteredListings}
           center={[center.lat, center.lng]}
           zoom={center.zoom}
           myLocation={myLocation}
         />
-      </MapContent>
+      </MapContainer>
+
+      {loading && <LoadingOverlay>Caricamento...</LoadingOverlay>}
+
+      <LegendOverlay>
+        <LegendTitle>Legenda</LegendTitle>
+        <LegendItem>
+          <LegendDot $color={RENT_COLOR} />
+          Affitto / Rent
+        </LegendItem>
+        <LegendItem>
+          <LegendDot $color={SALE_COLOR} />
+          Vendita / Sale
+        </LegendItem>
+        <LegendDivider />
+        <LegendCount>{filteredListings.length} annunci · OSM</LegendCount>
+      </LegendOverlay>
+
+      <CounterOverlay>{filteredListings.length} annunci visibili</CounterOverlay>
+
+      {error && (
+        <ErrorOverlay>
+          <span>{error}</span>
+          <button className="btn-sm" onClick={() => fetchListings()}>
+            Riprova
+          </button>
+        </ErrorOverlay>
+      )}
     </MapPageWrapper>
   );
 }

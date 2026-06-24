@@ -3,53 +3,63 @@ import { useAuthListener } from './features/auth/useAuth';
 import Header from './components/Header';
 import Toasts from './components/Toasts';
 import ProtectedRoute from './components/ProtectedRoute';
+import FilterSidebar from './components/layout/FilterSidebar';
 import LandingPage from './pages/LandingPage';
 import TabellaPage from './pages/TabellaPage';
 import MapPage from './pages/MapPage';
-import PlaceholderPage from './pages/PlaceholderPage';
+import StatsPage from './pages/StatsPage';
+
+function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flex: 1, overflow: 'hidden', height: 'calc(100vh - 64px)' }}>
+      <FilterSidebar count={0} />
+      <div style={{ flex: 1, overflow: 'hidden' }}>{children}</div>
+    </div>
+  );
+}
 
 export default function App() {
   useAuthListener();
 
   return (
     <BrowserRouter>
-      <Header />
-      <Toasts />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route
-          path="/tabella"
-          element={
-            <ProtectedRoute>
-              <TabellaPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/mappa"
-          element={
-            <ProtectedRoute>
-              <MapPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/analisi"
-          element={
-            <ProtectedRoute>
-              <PlaceholderPage title="Analisi" />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/senza-scelta"
-          element={
-            <ProtectedRoute>
-              <PlaceholderPage title="Senza Scelta" />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <Header />
+        <Toasts />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route
+            path="/tabella"
+            element={
+              <ProtectedRoute>
+                <AppShell>
+                  <TabellaPage />
+                </AppShell>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mappa"
+            element={
+              <ProtectedRoute>
+                <AppShell>
+                  <MapPage />
+                </AppShell>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/statistiche"
+            element={
+              <ProtectedRoute>
+                <AppShell>
+                  <StatsPage />
+                </AppShell>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }
