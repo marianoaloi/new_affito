@@ -184,9 +184,9 @@ function ClassicListingCard({ listing, onEditDescription }: CardControlsProps) {
 
   return (
     <ClassicCard>
-      <CardImg>
+      <CardImg $url={listing.photo?.urls.small}>
         <DealBadge $sale={sale}>{dealLabel(listing)}</DealBadge>
-        <CardImgText>foto</CardImgText>
+        {!listing.photo && <CardImgText>foto</CardImgText>}
       </CardImg>
       <CardBody>
         <CardTitle>{listing.title ?? '—'}</CardTitle>
@@ -230,9 +230,9 @@ function HorizListingCard({ listing, onEditDescription }: CardControlsProps) {
 
   return (
     <HorizCard>
-      <HorizImg>
+      <HorizImg $url={listing.photo?.urls.small}>
         <DealBadge $sale={sale}>{dealLabel(listing)}</DealBadge>
-        <CardImgText>foto</CardImgText>
+        {!listing.photo && <CardImgText>foto</CardImgText>}
       </HorizImg>
       <HorizBody>
         <CardTitle>{listing.title ?? '—'}</CardTitle>

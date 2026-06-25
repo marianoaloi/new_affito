@@ -1,5 +1,11 @@
 export type StateMaloi = 0 | 1 | 2;
 
+export interface ListingPhoto {
+  id: number;
+  caption?: string;
+  urls: { thumb: string; small: string; medium: string; large: string };
+}
+
 export interface ListingDTO {
   id: number;
   title: string;
@@ -17,6 +23,7 @@ export interface ListingDTO {
   elevator?: boolean;
   featureElevator?: string;
   accessibility?: number | null;
+  photo?: ListingPhoto;
 }
 
 export interface MapListingPhoto {

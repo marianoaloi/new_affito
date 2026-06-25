@@ -24,6 +24,7 @@ const PROJECTION = {
   'properties.energy.class.name': 1,
   'properties.elevator': 1,
   'properties.floor': 1,
+  'properties.photo': 1,
   'realEstatePage.title': 1,
   'realEstatePage.contractValue': 1,
   'realEstatePage.price.value': 1,
@@ -56,6 +57,7 @@ function toDTO(doc: Document): ListingDTO {
     elevator: doc.properties?.elevator,
     featureElevator: doc.feature?.featureList?.elevator,
     accessibility: doc.feature?.primaryFeatures?.Accesso_per_disabili ?? null,
+    photo: doc.properties?.photo,
   };
 }
 

@@ -114,9 +114,11 @@ export const ClassicCard = styled.div`
   flex-direction: column;
 `;
 
-export const CardImg = styled.div`
+export const CardImg = styled.div<{ $url?: string }>`
   height: 168px;
-  background-image: ${hatch};
+  background-image: ${({ $url }) => ($url ? `url(${$url})` : hatch)};
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -208,10 +210,12 @@ export const HorizCard = styled.div`
   display: flex;
 `;
 
-export const HorizImg = styled.div`
+export const HorizImg = styled.div<{ $url?: string }>`
   width: 170px;
   flex: none;
-  background-image: ${hatch};
+  background-image: ${({ $url }) => ($url ? `url(${$url})` : hatch)};
+  background-size: cover;
+  background-position: center;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

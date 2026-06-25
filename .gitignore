@@ -74,3 +74,5 @@ node_modules/
 .claude-flow/**
 specification/new_affitto/.obsidian/**
 specification/new_affitto/copilot/**
+functions/lib/**
+dist/**
