@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setPage,
@@ -14,7 +14,7 @@ import {
   useUpdateStateMutation,
 } from '../features/listings/listingsApi';
 import { recordStateUpdate, selectDecision } from '../features/decisions/decisionsSlice';
-import { addToast } from '../features/ui/uiSlice';
+import { addToast, setListingsCount } from '../features/ui/uiSlice';
 import BulkActionBar from '../components/listings/BulkActionBar';
 import DescriptionModal from '../components/listings/DescriptionModal';
 import StateBadge from '../components/listings/StateBadge';
@@ -321,6 +321,10 @@ export default function TabellaPage() {
   };
 
   const { data, isLoading, isFetching, isError, refetch } = useGetListingsQuery(query);
+
+  useEffect(() => {
+    dispatch(setListingsCount(data?.total ?? 0));
+  }, [data?.total, dispatch]);
 
   const rows = data?.data ?? [];
   const totalPages = data?.pages ?? 1;

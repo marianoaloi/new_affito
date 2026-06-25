@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useAuthListener } from './features/auth/useAuth';
+import { useAppSelector } from './app/hooks';
+import { selectListingsCount } from './features/ui/uiSlice';
 import Header from './components/Header';
 import Toasts from './components/Toasts';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -10,9 +12,10 @@ import MapPage from './pages/MapPage';
 import StatsPage from './pages/StatsPage';
 
 function AppShell({ children }: { children: React.ReactNode }) {
+  const count = useAppSelector(selectListingsCount);
   return (
     <div style={{ display: 'flex', flex: 1, overflow: 'hidden', height: 'calc(100vh - 64px)' }}>
-      <FilterSidebar count={0} />
+      <FilterSidebar count={count} />
       <div style={{ flex: 1, overflow: 'hidden' }}>{children}</div>
     </div>
   );

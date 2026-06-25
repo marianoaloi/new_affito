@@ -10,11 +10,13 @@ export interface Toast {
 interface UiState {
   toasts: Toast[];
   modal: string | null;
+  listingsCount: number;
 }
 
 const initialState: UiState = {
   toasts: [],
   modal: null,
+  listingsCount: 0,
 };
 
 let toastCounter = 0;
@@ -36,11 +38,15 @@ const uiSlice = createSlice({
     closeModal(state) {
       state.modal = null;
     },
+    setListingsCount(state, action: PayloadAction<number>) {
+      state.listingsCount = action.payload;
+    },
   },
 });
 
-export const { addToast, removeToast, openModal, closeModal } = uiSlice.actions;
+export const { addToast, removeToast, openModal, closeModal, setListingsCount } = uiSlice.actions;
 export default uiSlice.reducer;
 
 export const selectToasts = (state: RootState): Toast[] => state.ui.toasts;
 export const selectModal = (state: RootState): string | null => state.ui.modal;
+export const selectListingsCount = (state: RootState): number => state.ui.listingsCount;
