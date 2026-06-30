@@ -14,13 +14,6 @@ import MapView from '../components/map/MapView';
 import {
   MapPageWrapper,
   MapContainer,
-  LegendOverlay,
-  LegendTitle,
-  LegendItem,
-  LegendDot,
-  LegendDivider,
-  LegendCount,
-  CounterOverlay,
   LoadingOverlay,
   ErrorOverlay,
 } from './MapPage.styled';
@@ -30,9 +23,6 @@ const PROVINCE_CENTERS: Record<string, { lat: number; lng: number; zoom: number 
   Trieste: { lat: 45.643837, lng: 13.795002, zoom: 13 },
   Padova: { lat: 45.4064, lng: 11.8768, zoom: 13 },
 };
-
-const RENT_COLOR = '#28528C';
-const SALE_COLOR = '#A9683A';
 
 export default function MapPage() {
   const dispatch = useAppDispatch();
@@ -84,22 +74,6 @@ export default function MapPage() {
       </MapContainer>
 
       {loading && <LoadingOverlay>Caricamento...</LoadingOverlay>}
-
-      <LegendOverlay>
-        <LegendTitle>Legenda</LegendTitle>
-        <LegendItem>
-          <LegendDot $color={RENT_COLOR} />
-          Affitto / Rent
-        </LegendItem>
-        <LegendItem>
-          <LegendDot $color={SALE_COLOR} />
-          Vendita / Sale
-        </LegendItem>
-        <LegendDivider />
-        <LegendCount>{filteredListings.length} annunci · OSM</LegendCount>
-      </LegendOverlay>
-
-      <CounterOverlay>{filteredListings.length} annunci visibili</CounterOverlay>
 
       {error && (
         <ErrorOverlay>

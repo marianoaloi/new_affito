@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useAuthListener } from './features/auth/useAuth';
 import { useAppSelector } from './app/hooks';
 import { selectListingsCount } from './features/ui/uiSlice';
+import { selectFilteredListings } from './features/map/mapSlice';
 import Header from './components/Header';
 import Toasts from './components/Toasts';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -12,7 +13,10 @@ import MapPage from './pages/MapPage';
 import StatsPage from './pages/StatsPage';
 
 function AppShell({ children }: { children: React.ReactNode }) {
-  const count = useAppSelector(selectListingsCount);
+  const location = useLocation();
+  const listingsCount = useAppSelector(selectListingsCount);
+  const mapListings = useAppSelector(selectFilteredListings);
+  const count = location.pathname === '/mappa' ? mapListings.length : listingsCount;
   return (
     <div style={{ display: 'flex', flex: 1, overflow: 'hidden', height: 'calc(100vh - 64px)' }}>
       <FilterSidebar count={count} />
