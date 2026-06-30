@@ -17,6 +17,7 @@ import { recordStateUpdate, selectDecision } from '../features/decisions/decisio
 import { addToast, setListingsCount } from '../features/ui/uiSlice';
 import BulkActionBar from '../components/listings/BulkActionBar';
 import DescriptionModal from '../components/listings/DescriptionModal';
+import ListingDetailModal from '../components/listings/ListingDetailModal';
 import StateBadge from '../components/listings/StateBadge';
 import type { ListingDTO, ListingsQuery, StateMaloi } from '../types';
 import {
@@ -119,9 +120,10 @@ function chips(listing: ListingDTO): string[] {
 interface CardControlsProps {
   listing: ListingDTO;
   onEditDescription: (id: number, description: string) => void;
+  onOpenDetail: (listing: ListingDTO) => void;
 }
 
-function useCardControls({ listing, onEditDescription }: CardControlsProps) {
+function useCardControls({ listing, onEditDescription, onOpenDetail }: CardControlsProps) {
   const dispatch = useAppDispatch();
   const selectedIds = useAppSelector(selectSelectedIds);
   const decision = useAppSelector(selectDecision(listing.id));
@@ -143,8 +145,9 @@ function useCardControls({ listing, onEditDescription }: CardControlsProps) {
 
   const toggle = () => dispatch(toggleSelectId(listing.id));
   const edit = () => onEditDescription(listing.id, description);
+  const openDetail = () => onOpenDetail(listing);
 
-  return { stateMaloi, checked, isLoading, setState, toggle, edit };
+  return { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail };
 }
 
 function CardActionButtons({
@@ -174,10 +177,11 @@ function CardActionButtons({
   );
 }
 
-function ClassicListingCard({ listing, onEditDescription }: CardControlsProps) {
-  const { stateMaloi, checked, isLoading, setState, toggle, edit } = useCardControls({
+function ClassicListingCard({ listing, onEditDescription, onOpenDetail }: CardControlsProps) {
+  const { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
     listing,
     onEditDescription,
+    onOpenDetail,
   });
   const sale = isSale(listing);
   const tags = chips(listing);
@@ -189,12 +193,19 @@ function ClassicListingCard({ listing, onEditDescription }: CardControlsProps) {
         {!listing.photo && <CardImgText>foto</CardImgText>}
       </CardImg>
       <CardBody>
-        <CardTitle>{listing.title ?? '—'}</CardTitle>
+        <CardTitle style={{ cursor: 'pointer' }} onClick={openDetail}>{listing.title ?? '—'}</CardTitle>
         <CardSub>
           {listing.province ?? '—'}
           {listing.contractValue ? ` · ${listing.contractValue}` : ''}
         </CardSub>
-        <CardPrice>{priceText(listing)}</CardPrice>
+        <a
+          href={`https://www.immobiliare.it/annunci/${listing.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none' }}
+        >
+          <CardPrice style={{ cursor: 'pointer' }}>{priceText(listing)}</CardPrice>
+        </a>
         <CardSpecs>{specsText(listing)}</CardSpecs>
         {tags.length > 0 && (
           <ChipRow>
@@ -220,10 +231,11 @@ function ClassicListingCard({ listing, onEditDescription }: CardControlsProps) {
   );
 }
 
-function HorizListingCard({ listing, onEditDescription }: CardControlsProps) {
-  const { stateMaloi, checked, isLoading, setState, toggle, edit } = useCardControls({
+function HorizListingCard({ listing, onEditDescription, onOpenDetail }: CardControlsProps) {
+  const { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
     listing,
     onEditDescription,
+    onOpenDetail,
   });
   const sale = isSale(listing);
   const m2 = perM2(listing);
@@ -235,12 +247,19 @@ function HorizListingCard({ listing, onEditDescription }: CardControlsProps) {
         {!listing.photo && <CardImgText>foto</CardImgText>}
       </HorizImg>
       <HorizBody>
-        <CardTitle>{listing.title ?? '—'}</CardTitle>
+        <CardTitle style={{ cursor: 'pointer' }} onClick={openDetail}>{listing.title ?? '—'}</CardTitle>
         <CardSub>
           {listing.province ?? '—'}
           {listing.contractValue ? ` · ${listing.contractValue}` : ''}
         </CardSub>
-        <HorizPrice>{priceText(listing)}</HorizPrice>
+        <a
+          href={`https://www.immobiliare.it/annunci/${listing.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none' }}
+        >
+          <HorizPrice style={{ cursor: 'pointer' }}>{priceText(listing)}</HorizPrice>
+        </a>
         <CardSpecs>
           {specsText(listing)}
           {m2 ? ` · ${m2}` : ''}
@@ -262,10 +281,11 @@ function HorizListingCard({ listing, onEditDescription }: CardControlsProps) {
   );
 }
 
-function CompactListingRow({ listing, onEditDescription }: CardControlsProps) {
-  const { stateMaloi, checked, isLoading, setState, toggle, edit } = useCardControls({
+function CompactListingRow({ listing, onEditDescription, onOpenDetail }: CardControlsProps) {
+  const { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
     listing,
     onEditDescription,
+    onOpenDetail,
   });
   const sale = isSale(listing);
 
@@ -282,7 +302,7 @@ function CompactListingRow({ listing, onEditDescription }: CardControlsProps) {
         <DealBadge $sale={sale}>{dealLabel(listing)}</DealBadge>
       </CompactBadge>
       <CompactMain>
-        <CompactTitle>{listing.title ?? '—'}</CompactTitle>
+        <CompactTitle style={{ cursor: 'pointer' }} onClick={openDetail}>{listing.title ?? '—'}</CompactTitle>
         <CompactSub>
           {listing.province ?? '—'}
           {listing.contractValue ? ` · ${listing.contractValue}` : ''}
@@ -291,7 +311,14 @@ function CompactListingRow({ listing, onEditDescription }: CardControlsProps) {
       <CompactSpecs>{specsText(listing)}</CompactSpecs>
       <StateBadge state={stateMaloi} />
       <CardActionButtons isLoading={isLoading} setState={(s) => void setState(s)} edit={edit} />
-      <CompactPrice>{priceText(listing)}</CompactPrice>
+      <a
+        href={`https://www.immobiliare.it/annunci/${listing.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ textDecoration: 'none' }}
+      >
+        <CompactPrice style={{ cursor: 'pointer' }}>{priceText(listing)}</CompactPrice>
+      </a>
     </CompactRow>
   );
 }
@@ -306,6 +333,7 @@ export default function TabellaPage() {
   const [sortField, setSortField] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [modal, setModal] = useState<ModalState | null>(null);
+  const [detailId, setDetailId] = useState<number | null>(null);
 
   const query: ListingsQuery = {
     page,
@@ -340,13 +368,14 @@ export default function TabellaPage() {
   };
 
   const onEditDescription = (id: number, description: string) => setModal({ id, description });
+  const onOpenDetail = (listing: ListingDTO) => setDetailId(listing.id);
 
   const renderCards = () => {
     if (cardStyle === 'horiz') {
       return (
         <HorizGrid>
           {rows.map((l) => (
-            <HorizListingCard key={l.id} listing={l} onEditDescription={onEditDescription} />
+            <HorizListingCard key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} />
           ))}
         </HorizGrid>
       );
@@ -355,7 +384,7 @@ export default function TabellaPage() {
       return (
         <CompactList>
           {rows.map((l) => (
-            <CompactListingRow key={l.id} listing={l} onEditDescription={onEditDescription} />
+            <CompactListingRow key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} />
           ))}
         </CompactList>
       );
@@ -363,7 +392,7 @@ export default function TabellaPage() {
     return (
       <ClassicGrid>
         {rows.map((l) => (
-          <ClassicListingCard key={l.id} listing={l} onEditDescription={onEditDescription} />
+          <ClassicListingCard key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} />
         ))}
       </ClassicGrid>
     );
@@ -471,6 +500,13 @@ export default function TabellaPage() {
           listingId={modal.id}
           currentDescription={modal.description}
           onClose={() => setModal(null)}
+        />
+      )}
+
+      {detailId !== null && (
+        <ListingDetailModal
+          listingId={detailId}
+          onClose={() => setDetailId(null)}
         />
       )}
     </PageContent>

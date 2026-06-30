@@ -6,6 +6,48 @@ export interface ListingPhoto {
   urls: { thumb: string; small: string; medium: string; large: string };
 }
 
+export interface ListingDetailDTO extends ListingDTO {
+  photos: ListingPhoto[];
+  // Location
+  address?: string | null;
+  city?: string;
+  macrozone?: string | null;
+  microzone?: string | null;
+  // Specs
+  availability?: string;
+  caption?: string;
+  propertyDescription?: string;
+  rooms?: string;
+  bathrooms?: string;
+  furniture?: string;
+  buildingYear?: number;
+  garage?: string;
+  // Costs
+  condominiumExpenses?: string;
+  heatingExpenses?: string;
+  deposit?: string | null;
+  availableToStudents?: boolean;
+  // Energy
+  heatingType?: string;
+  airConditioning?: string;
+  epi?: string | number;
+  epiUm?: string;
+  pricePerSquareMeter?: string;
+  // Feature flags (primaryFeatures)
+  hasBalcony?: boolean;
+  hasTerrace?: boolean;
+  hasCellar?: boolean;
+  hasGarden?: boolean;
+  hasPool?: boolean;
+  hasAlarm?: boolean;
+  hasVideoIntercom?: boolean;
+  hasSecureDoor?: boolean;
+  hasFiber?: boolean;
+  // Dates
+  createdAt?: number;
+  updatedAt?: number;
+}
+
 export interface ListingDTO {
   id: number;
   title: string;
