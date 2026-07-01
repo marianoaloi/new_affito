@@ -1,247 +1,157 @@
 import { useMemo } from 'react';
-import { useGetSummaryQuery } from '../features/stats/statsApi';
-import type { SummaryGroup } from '../types';
 import {
-  PageContent,
-  PageHeader,
-  PageTitle,
-  PageSubtitle,
-  StatsGrid,
-  Panel,
-  PanelTitle,
-  PanelSub,
-  BarRow,
-  BarLabel,
-  BarLabelName,
-  BarLabelValue,
-  BarTrack,
-  BarFill,
-  ChartWrap,
-  TrendLegend,
-  TrendLegendItem,
-  TrendDot,
-  LoadingState,
-  ErrorState,
-  RetryButton,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer,
+} from 'recharts';
+import { useGetStatisticGroupsQuery } from '../features/stats/statsApi';
+import type { StatisticGroup } from '../types';
+import {
+  PageContent, PageHeader, PageTitle, PageSubtitle,
+  PanelStack, Panel, PanelTitle, PanelSub,
+  ChartRow, ChartWrap,
+  LoadingState, ErrorState, RetryButton,
 } from './StatsPage.styled';
 
-const formatEuro = (n: number) => '€' + Math.round(n).toLocaleString('it-IT');
-const formatCount = (n: number) => Math.round(n).toLocaleString('it-IT');
+const C = { si: '#16a34a', senza: '#9ca3af', no: '#dc2626', cosi: '#ca8a04' };
 
-const TREND = [
-  { city: 'Udine', color: '#28528C', vals: [690, 695, 700, 705, 712, 720, 726, 735] },
-  { city: 'Trieste', color: '#A9683A', vals: [820, 824, 835, 841, 850, 861, 872, 886] },
-  { city: 'Padova', color: '#5E7FB0', vals: [908, 915, 926, 940, 955, 968, 981, 996] },
-];
-const MONTHS = ['Nov', 'Dic', 'Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu'];
+const TYPE_SHORT: Record<string, string> = { A: 'Aff', C: 'Com', a: 'Aff', c: 'Com' };
 
-interface CityAgg {
-  province: string;
-  total: number;
-  accept: number;
-  deny: number;
-  wait: number;
-  emptyChoise: number;
+function shortLabel(g: StatisticGroup): string {
+  return `${g.province}-${TYPE_SHORT[g.type] ?? g.type}`;
 }
 
-function aggregateByCity(groups: SummaryGroup[]): CityAgg[] {
-  const map = new Map<string, CityAgg>();
-  for (const g of groups) {
-    const key = g.province ?? '—';
-    const cur =
-      map.get(key) ?? { province: key, total: 0, accept: 0, deny: 0, wait: 0, emptyChoise: 0 };
-    cur.total += g.total ?? 0;
-    cur.accept += g.accept ?? 0;
-    cur.deny += g.deny ?? 0;
-    cur.wait += g.wait ?? 0;
-    cur.emptyChoise += g.emptyChoise ?? 0;
-    map.set(key, cur);
-  }
-  return [...map.values()].sort((a, b) => b.total - a.total);
+interface Row { name: string; si: number; senza: number; no: number; cosi?: number; }
+
+function toPct(row: Row): Row {
+  const total = Math.max(1, row.si + row.senza + row.no + (row.cosi ?? 0));
+  return {
+    name: row.name,
+    si:    Math.round((row.si    / total) * 100),
+    senza: Math.round((row.senza / total) * 100),
+    no:    Math.round((row.no    / total) * 100),
+    ...(row.cosi !== undefined ? { cosi: Math.round((row.cosi / total) * 100) } : {}),
+  };
 }
 
-interface BarDatum {
-  label: string;
-  value: number;
-  color: string;
+interface ChartPanelProps {
+  title: string;
+  sub: string;
+  data: Row[];
+  withCosi?: boolean;
 }
 
-function BarChart({ data, format }: { data: BarDatum[]; format: (n: number) => string }) {
-  const max = Math.max(1, ...data.map((d) => d.value));
-  return (
-    <>
-      {data.map((d) => (
-        <BarRow key={d.label}>
-          <BarLabel>
-            <BarLabelName>{d.label}</BarLabelName>
-            <BarLabelValue>{format(d.value)}</BarLabelValue>
-          </BarLabel>
-          <BarTrack>
-            <BarFill $pct={(d.value / max) * 100} $color={d.color} />
-          </BarTrack>
-        </BarRow>
-      ))}
-    </>
-  );
-}
+const TICK_STYLE = { fontSize: 11, fill: '#6b7280', fontFamily: 'IBM Plex Mono, monospace' };
+const AXIS_LABEL_STYLE = { fontSize: 11, fill: '#9097a2' };
+const LEGEND_STYLE = { fontSize: 12, paddingBottom: 8 };
+const MARGIN = { top: 8, right: 8, left: 0, bottom: 24 };
 
-function TrendChart() {
-  const W = 600,
-    H = 220,
-    padL = 46,
-    padR = 18,
-    padT = 18,
-    padB = 34;
-  const all = TREND.flatMap((t) => t.vals);
-  const vmin = Math.min(...all);
-  const vmax = Math.max(...all);
-  const span = vmax - vmin || 1;
+function DualChart({ title, sub, data, withCosi = false }: ChartPanelProps) {
+  const pctData = useMemo(() => data.map(toPct), [data]);
 
-  const xFor = (i: number) => padL + i * ((W - padL - padR) / (MONTHS.length - 1));
-  const yFor = (v: number) => padT + (1 - (v - vmin) / span) * (H - padT - padB);
-
-  const gridCount = 4;
-  const gridLines = Array.from({ length: gridCount }, (_, i) => {
-    const v = vmin + (span * i) / (gridCount - 1);
-    return { v, y: yFor(v) };
-  });
+  const bars = [
+    { key: 'si',    name: 'Yes',        fill: C.si },
+    { key: 'senza', name: 'Senza Info', fill: C.senza },
+    { key: 'no',    name: 'No',         fill: C.no },
+    ...(withCosi ? [{ key: 'cosi', name: 'Così così', fill: C.cosi }] : []),
+  ];
 
   return (
-    <ChartWrap>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%' }}>
-        {gridLines.map((g) => (
-          <g key={g.v}>
-            <line x1={padL} y1={g.y} x2={W - padR} y2={g.y} stroke="#EFEFEA" strokeWidth={1} />
-            <text
-              x={padL - 8}
-              y={g.y + 4}
-              textAnchor="end"
-              fontFamily="'IBM Plex Mono', monospace"
-              fontSize={11}
-              fill="#9097A2"
-            >
-              {formatEuro(g.v)}
-            </text>
-          </g>
-        ))}
-
-        {MONTHS.map((m, i) => (
-          <text
-            key={m}
-            x={xFor(i)}
-            y={H - padB + 20}
-            textAnchor="middle"
-            fontFamily="'IBM Plex Mono', monospace"
-            fontSize={11}
-            fill="#9097A2"
-          >
-            {m}
-          </text>
-        ))}
-
-        {TREND.map((t) => (
-          <g key={t.city}>
-            <polyline
-              points={t.vals.map((v, i) => `${xFor(i)},${yFor(v)}`).join(' ')}
-              fill="none"
-              stroke={t.color}
-              strokeWidth={2}
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-            <circle
-              cx={xFor(t.vals.length - 1)}
-              cy={yFor(t.vals[t.vals.length - 1])}
-              r={4}
-              fill={t.color}
-            />
-          </g>
-        ))}
-      </svg>
-      <TrendLegend>
-        {TREND.map((t) => (
-          <TrendLegendItem key={t.city}>
-            <TrendDot $color={t.color} />
-            {t.city}
-          </TrendLegendItem>
-        ))}
-      </TrendLegend>
-    </ChartWrap>
+    <Panel>
+      <PanelTitle>{title}</PanelTitle>
+      <PanelSub>{sub}</PanelSub>
+      <ChartRow>
+        <ChartWrap>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={data} margin={MARGIN} barCategoryGap="20%">
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="name" tick={TICK_STYLE} label={{ value: 'Province', position: 'insideBottom', offset: -12, style: AXIS_LABEL_STYLE }} />
+              <YAxis tick={TICK_STYLE} label={{ value: 'Count', angle: -90, position: 'insideLeft', offset: 10, style: AXIS_LABEL_STYLE }} />
+              <Tooltip />
+              <Legend verticalAlign="top" wrapperStyle={LEGEND_STYLE} />
+              {bars.map((b) => (
+                <Bar key={b.key} dataKey={b.key} name={b.name} stackId="a" fill={b.fill} />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartWrap>
+        <ChartWrap>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={pctData} margin={MARGIN} barCategoryGap="20%">
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="name" tick={TICK_STYLE} label={{ value: 'Province', position: 'insideBottom', offset: -12, style: AXIS_LABEL_STYLE }} />
+              <YAxis domain={[0, 100]} tick={TICK_STYLE} label={{ value: '%', angle: -90, position: 'insideLeft', offset: 10, style: AXIS_LABEL_STYLE }} />
+              <Tooltip />
+              <Legend verticalAlign="top" wrapperStyle={LEGEND_STYLE} />
+              {bars.map((b) => (
+                <Bar key={b.key} dataKey={b.key} name={b.name} stackId="a" fill={b.fill} />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartWrap>
+      </ChartRow>
+    </Panel>
   );
 }
 
 export default function StatsPage() {
-  const { data, isLoading, isError, refetch } = useGetSummaryQuery();
+  const { data, isLoading, isError, refetch } = useGetStatisticGroupsQuery();
 
-  const cities = useMemo<CityAgg[]>(
-    () => aggregateByCity(data?.groups ?? []),
+  const groups = useMemo<StatisticGroup[]>(
+    () => [...(data?.groups ?? [])].sort((a, b) => b.total - a.total),
     [data?.groups],
   );
 
-  const countByCity = useMemo<BarDatum[]>(
-    () => cities.map((c) => ({ label: c.province, value: c.total, color: '#A9683A' })),
-    [cities],
+  const disableData = useMemo<Row[]>(
+    () => groups.map((g) => ({ name: shortLabel(g), si: g.disable_si, senza: g.disable_senza, no: g.disable_no })),
+    [groups],
   );
 
-  const proxyByCity = useMemo<BarDatum[]>(
-    () => cities.map((c) => ({ label: c.province, value: c.total, color: '#28528C' })),
-    [cities],
+  const stateData = useMemo<Row[]>(
+    () => groups.map((g) => ({ name: shortLabel(g), si: g.state_si, senza: g.state_senza, no: g.state_no, cosi: g.state_cosi })),
+    [groups],
   );
 
-  const stateDist = useMemo<BarDatum[]>(() => {
-    const t = data?.totals;
-    return [
-      { label: 'Buoni', value: t?.accept ?? 0, color: '#16a34a' },
-      { label: 'Così così', value: t?.wait ?? 0, color: '#ca8a04' },
-      { label: 'Non buoni', value: t?.deny ?? 0, color: '#dc2626' },
-      { label: 'Senza scelta', value: t?.emptyChoise ?? 0, color: '#9ca3af' },
-    ];
-  }, [data?.totals]);
+  const elevatorData = useMemo<Row[]>(
+    () => groups.map((g) => ({ name: shortLabel(g), si: g.elevator_si, senza: g.elevator_senza, no: g.elevator_no })),
+    [groups],
+  );
 
-  const renderBody = (content: React.ReactNode) => {
-    if (isLoading) return <LoadingState>Caricamento…</LoadingState>;
-    if (isError)
-      return (
+  if (isLoading) return <PageContent><LoadingState>Caricamento…</LoadingState></PageContent>;
+  if (isError)
+    return (
+      <PageContent>
         <ErrorState>
           <span>Errore nel caricamento dei dati.</span>
           <RetryButton onClick={() => refetch()}>Riprova</RetryButton>
         </ErrorState>
-      );
-    return content;
-  };
+      </PageContent>
+    );
 
   return (
     <PageContent>
       <PageHeader>
         <PageTitle>Statistiche / Statistics</PageTitle>
-        <PageSubtitle>Panoramica del mercato e dello stato delle valutazioni</PageSubtitle>
+        <PageSubtitle>Distribuzione per provincia e tipologia — confronto quantità e percentuale</PageSubtitle>
       </PageHeader>
 
-      <StatsGrid>
-        <Panel>
-          <PanelTitle>Canone medio per città</PanelTitle>
-          <PanelSub>Average rent price per city · €/mese</PanelSub>
-          {renderBody(<BarChart data={proxyByCity} format={formatCount} />)}
-        </Panel>
-
-        <Panel>
-          <PanelTitle>Annunci per città</PanelTitle>
-          <PanelSub>Listings count by city</PanelSub>
-          {renderBody(<BarChart data={countByCity} format={formatCount} />)}
-        </Panel>
-
-        <Panel>
-          <PanelTitle>Distribuzione stato / State distribution</PanelTitle>
-          <PanelSub>Stato valutazione annunci</PanelSub>
-          {renderBody(<BarChart data={stateDist} format={formatCount} />)}
-        </Panel>
-
-        <Panel>
-          <PanelTitle>Andamento stimato / Estimated trend</PanelTitle>
-          <PanelSub>Indice di mercato stimato · €/mese</PanelSub>
-          <TrendChart />
-        </Panel>
-      </StatsGrid>
+      <PanelStack>
+        <DualChart
+          title="Statistics by Province and Disabled Access"
+          sub="Property count distribution across provinces, segregated by Disabled Access"
+          data={disableData}
+        />
+        <DualChart
+          title="Statistics by Province and StateMaloi"
+          sub="Property count distribution across provinces, segregated by state evaluation"
+          data={stateData}
+          withCosi
+        />
+        <DualChart
+          title="Statistics by Province and Elevator"
+          sub="Property count distribution across provinces, segregated by elevator status"
+          data={elevatorData}
+        />
+      </PanelStack>
     </PageContent>
   );
 }

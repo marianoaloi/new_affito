@@ -23,22 +23,22 @@ export const PageSubtitle = styled.p`
   color: #7a808c;
 `;
 
-export const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 20px;
+export const PanelStack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 `;
 
 export const Panel = styled.section`
   background: #fff;
   border: 1px solid #e7e7e2;
   border-radius: 16px;
-  padding: 24px;
+  padding: 24px 24px 16px;
 `;
 
 export const PanelTitle = styled.div`
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
   margin-bottom: 3px;
   color: #181b22;
 `;
@@ -49,78 +49,21 @@ export const PanelSub = styled.div`
   margin-bottom: 20px;
 `;
 
-export const BarRow = styled.div`
-  margin-bottom: 16px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-export const BarLabel = styled.div`
+export const ChartRow = styled.div`
   display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  margin-bottom: 6px;
-  color: #181b22;
-`;
-
-export const BarLabelName = styled.span`
-  font-weight: 600;
-`;
-
-export const BarLabelValue = styled.span`
-  font-family: 'IBM Plex Mono', monospace;
-  color: #5e6573;
-`;
-
-export const BarTrack = styled.div`
-  height: 10px;
-  background: #f1f2ee;
-  border-radius: 6px;
-  overflow: hidden;
-`;
-
-export const BarFill = styled.div<{ $pct: number; $color: string }>`
-  height: 100%;
-  border-radius: 6px;
-  background: ${(p) => p.$color};
-  width: ${(p) => p.$pct}%;
-  transition: width 0.3s ease;
+  gap: 24px;
 `;
 
 export const ChartWrap = styled.div`
-  width: 100%;
-`;
-
-export const TrendLegend = styled.div`
-  display: flex;
-  gap: 18px;
-  margin-top: 14px;
-  flex-wrap: wrap;
-`;
-
-export const TrendLegendItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 13px;
-  color: #181b22;
-`;
-
-export const TrendDot = styled.span<{ $color: string }>`
-  width: 11px;
-  height: 11px;
-  border-radius: 3px;
-  background: ${(p) => p.$color};
-  display: inline-block;
+  flex: 1 1 0;
+  min-width: 0;
 `;
 
 export const LoadingState = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 120px;
+  height: 220px;
   color: #9097a2;
   font-size: 14px;
 `;
@@ -134,7 +77,6 @@ export const ErrorState = styled.div`
   border: 1px solid #fecaca;
   border-radius: 8px;
   color: var(--red);
-  margin-bottom: 1rem;
 `;
 
 export const RetryButton = styled.button`

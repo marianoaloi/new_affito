@@ -17,9 +17,10 @@ function AppShell({ children }: { children: React.ReactNode }) {
   const listingsCount = useAppSelector(selectListingsCount);
   const mapListings = useAppSelector(selectFilteredListings);
   const count = location.pathname === '/mappa' ? mapListings.length : listingsCount;
+  const showSidebar = location.pathname !== '/statistiche';
   return (
     <div style={{ display: 'flex', flex: 1, overflow: 'hidden', height: 'calc(100vh - 64px)' }}>
-      <FilterSidebar count={count} />
+      {showSidebar && <FilterSidebar count={count} />}
       <div style={{ flex: 1, overflow: 'hidden' }}>{children}</div>
     </div>
   );

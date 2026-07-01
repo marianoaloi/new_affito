@@ -140,3 +140,23 @@ export interface SummaryResponse {
     emptyChoise: number;
   };
 }
+
+export interface StatisticGroup {
+  province: string;
+  type: string;
+  total: number;
+  disable_si: number;
+  disable_no: number;
+  disable_senza: number;
+  state_si: number;
+  state_no: number;
+  state_cosi: number;
+  state_senza: number;
+  elevator_si: number;
+  elevator_no: number;
+  elevator_senza: number;
+}
+
+export interface StatisticResponse {
+  groups: StatisticGroup[];
+}
