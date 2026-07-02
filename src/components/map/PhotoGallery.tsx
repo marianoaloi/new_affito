@@ -23,10 +23,15 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
   const [hover, setHover] = useState<HoverState | null>(null);
 
   const handleMouseMove = useCallback((e: React.MouseEvent, src: string) => {
-    let x = e.clientX + OFFSET;
-     x -= SIZE_MENU;
-    let y = e.clientY + OFFSET;
-    y -= MENU_NAV;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const leafletPopup = e.currentTarget.closest('.leaflet-popup');
+    const leafletRect = leafletPopup ? leafletPopup.getBoundingClientRect() : { left: 0, top: 0 };
+    const popupWrapper = e.currentTarget.closest('.leaflet-popup-content-wrapper');
+    const wrapperRect = popupWrapper ? popupWrapper.getBoundingClientRect() : rect;
+    const targetX = Math.min(wrapperRect.right + OFFSET, window.innerWidth - PREVIEW_W - OFFSET);
+    const targetY = Math.max(MENU_NAV, Math.min(Math.max(0, wrapperRect.top), window.innerHeight - PREVIEW_H - OFFSET));
+    const x = targetX - leafletRect.left;
+    const y = targetY - leafletRect.top;
     setHover({ src, x, y });
   }, []);
 
