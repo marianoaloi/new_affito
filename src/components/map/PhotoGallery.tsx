@@ -15,7 +15,6 @@ const PER_PAGE = 9;
 const PREVIEW_W = 320;
 const PREVIEW_H = 240;
 const OFFSET = 14;
-const SIZE_MENU = 300;
 const MENU_NAV = 64;
 
 export default function PhotoGallery({ photos }: PhotoGalleryProps) {
