@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { Filter, Document } from 'mongodb';
 import { getDb } from '../db/mongo';
 import { AuthRequest } from '../middleware/auth';
-import { ListingDTO, ListingsResponse, StateMaloi } from '../types/index';
+import { ListingDTO, ListingDetailDTO, ListingPhoto, ListingsResponse, StateMaloi } from '../types/index';
 
 const router = Router();
 
@@ -24,6 +24,7 @@ const PROJECTION = {
   'properties.energy.class.name': 1,
   'properties.elevator': 1,
   'properties.floor': 1,
+  'properties.photo': 1,
   'realEstatePage.title': 1,
   'realEstatePage.contractValue': 1,
   'realEstatePage.price.value': 1,
@@ -56,6 +57,7 @@ function toDTO(doc: Document): ListingDTO {
     elevator: doc.properties?.elevator,
     featureElevator: doc.feature?.featureList?.elevator,
     accessibility: doc.feature?.primaryFeatures?.Accesso_per_disabili ?? null,
+    photo: doc.properties?.photo,
   };
 }
 
@@ -137,6 +139,136 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
     res.json(response);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch listings' });
+  }
+});
+
+// GET /:id — full listing detail with all photos
+router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const id = parseInt(String(req.params.id), 10);
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: 'Invalid id' });
+      return;
+    }
+
+    const db = await getDb();
+    const doc = await db.collection(READ_COLLECTION).findOne(
+      { _id: id as unknown as Document['_id'] },
+      {
+        projection: {
+          _id: 1, type: 1, description: 1, stateMaloi: 1, mLastUpdate: 1,
+          // feature
+          'feature.province': 1, 'feature.type': 1,
+          'feature.featureList': 1,
+          'feature.primaryFeatures': 1,
+          // properties – specs
+          'properties.surfaceValue': 1,
+          'properties.buildingYear': 1,
+          'properties.garage': 1,
+          'properties.availability': 1,
+          'properties.caption': 1,
+          'properties.description': 1,
+          // properties – floor + elevator
+          'properties.elevator': 1,
+          'properties.floor': 1,
+          // properties – energy
+          'properties.energy': 1,
+          // properties – costs
+          'properties.costs.condominiumExpenses': 1,
+          'properties.costs.heatingExpenses': 1,
+          // properties – rent
+          'properties.rent.deposit': 1,
+          'properties.rent.availableToStudents': 1,
+          // properties – location
+          'properties.location.address': 1,
+          'properties.location.city': 1,
+          'properties.location.macrozone': 1,
+          'properties.location.microzone': 1,
+          // properties – media
+          'properties.photo': 1,
+          'properties.multimedia.photos': 1,
+          // realEstatePage
+          'realEstatePage.title': 1,
+          'realEstatePage.contractValue': 1,
+          'realEstatePage.price': 1,
+          'realEstatePage.createdAt': 1,
+          'realEstatePage.updatedAt': 1,
+        },
+      }
+    );
+
+    if (!doc) {
+      res.status(404).json({ error: 'Listing not found' });
+      return;
+    }
+
+    const rawPhotos: Document[] = doc.properties?.multimedia?.photos ?? [];
+    const photos: ListingPhoto[] = rawPhotos
+      .filter((p: Document) => p?.urls?.small)
+      .map((p: Document) => ({
+        id: p.id ?? 0,
+        caption: p.caption,
+        urls: {
+          thumb: p.urls.thumb ?? '',
+          small: p.urls.small ?? '',
+          medium: p.urls.medium ?? p.urls.small ?? '',
+          large: p.urls.large ?? p.urls.small ?? '',
+        },
+      }));
+
+    const pf = doc.feature?.primaryFeatures ?? {};
+    const fl = doc.feature?.featureList ?? {};
+    const boolPF = (key: string): boolean | undefined => {
+      const v = pf[key];
+      return v != null ? v === 1 : undefined;
+    };
+
+    const detail: ListingDetailDTO = {
+      ...toDTO(doc),
+      photos,
+      // Location
+      address: doc.properties?.location?.address ?? null,
+      city: doc.properties?.location?.city,
+      macrozone: doc.properties?.location?.macrozone ?? null,
+      microzone: doc.properties?.location?.microzone ?? null,
+      // Specs
+      availability: doc.properties?.availability,
+      caption: doc.properties?.caption,
+      propertyDescription: doc.properties?.description,
+      rooms: fl.rooms,
+      bathrooms: fl.bathrooms,
+      furniture: fl.furniture,
+      buildingYear: doc.properties?.buildingYear,
+      garage: doc.properties?.garage,
+      // Costs
+      condominiumExpenses: doc.properties?.costs?.condominiumExpenses,
+      heatingExpenses: doc.properties?.costs?.heatingExpenses,
+      deposit: doc.properties?.rent?.deposit ?? null,
+      availableToStudents: doc.properties?.rent?.availableToStudents,
+      // Energy
+      heatingType: doc.properties?.energy?.heatingType,
+      airConditioning: doc.properties?.energy?.airConditioning,
+      epi: doc.properties?.energy?.epi,
+      epiUm: doc.properties?.energy?.epiUm,
+      pricePerSquareMeter: doc.realEstatePage?.price?.pricePerSquareMeter,
+      // Feature flags
+      hasBalcony: boolPF('balcone'),
+      hasTerrace: boolPF('terrazza'),
+      hasCellar: boolPF('cantina'),
+      hasGarden: boolPF('Giardino_privato') ?? boolPF('Giardino_comune'),
+      hasPool: boolPF('piscina'),
+      hasAlarm: boolPF('Impianto_di_allarme'),
+      hasVideoIntercom: boolPF('videoCitofono'),
+      hasSecureDoor: boolPF('Porta_blindata'),
+      hasFiber: boolPF('Fibra_ottica'),
+      // Dates
+      createdAt: doc.realEstatePage?.createdAt,
+      updatedAt: doc.realEstatePage?.updatedAt,
+    };
+
+    res.json(detail);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch listing' });
   }
 });
 

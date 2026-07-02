@@ -6,6 +6,7 @@ import listingsReducer from '../features/listings/listingsSlice';
 import decisionsReducer from '../features/decisions/decisionsSlice';
 import uiReducer from '../features/ui/uiSlice';
 import mapReducer from '../features/map/mapSlice';
+import sharedFiltersReducer from '../features/shared/filtersSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     decisions: decisionsReducer,
     ui: uiReducer,
     map: mapReducer,
+    sharedFilters: sharedFiltersReducer,
     [baseApi.reducerPath]: baseApi.reducer,
     [statsApi.reducerPath]: statsApi.reducer,
   },

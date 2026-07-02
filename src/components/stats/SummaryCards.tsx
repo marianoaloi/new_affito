@@ -1,68 +1,64 @@
+import styled from '@emotion/styled';
 import type { SummaryResponse } from '../../types';
 
 interface SummaryCardsProps {
   data: SummaryResponse;
 }
 
+const CardsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+`;
+
+const SummaryCard = styled.div`
+  background: #fff;
+  border: 1px solid #e7e7e2;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const Value = styled.span`
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  color: #181b22;
+  line-height: 1.1;
+`;
+
+const Label = styled.span`
+  font-weight: 600;
+  font-size: 15px;
+  color: #181b22;
+`;
+
+const Sub = styled.span`
+  color: #9097a2;
+  font-size: 13px;
+`;
+
 export default function SummaryCards({ data }: SummaryCardsProps) {
   const totals = data?.totals;
-  const groups = data?.groups ?? [];
+
+  const cards = [
+    { value: totals?.total ?? 0, label: 'Totale', sub: 'Annunci totali' },
+    { value: totals?.accept ?? 0, label: 'Buoni', sub: 'Accettati' },
+    { value: totals?.deny ?? 0, label: 'Non buoni', sub: 'Rifiutati' },
+    { value: totals?.wait ?? 0, label: 'Così così', sub: 'In attesa' },
+    { value: totals?.emptyChoise ?? 0, label: 'Senza scelta', sub: 'Da valutare' },
+  ];
 
   return (
-    <div className="summary">
-      <div className="summary-totals">
-        <div className="summary-card">
-          <span className="summary-value">{totals?.total ?? 0}</span>
-          <span className="summary-label">Totale</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-value">{totals?.accept ?? 0}</span>
-          <span className="summary-label">Accettati</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-value">{totals?.deny ?? 0}</span>
-          <span className="summary-label">Rifiutati</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-value">{totals?.wait ?? 0}</span>
-          <span className="summary-label">In attesa</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-value">{totals?.emptyChoise ?? 0}</span>
-          <span className="summary-label">Senza scelta</span>
-        </div>
-      </div>
-
-      {groups.length > 0 && (
-        <div className="table-wrap">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Provincia</th>
-                <th>Tipo</th>
-                <th>Totale</th>
-                <th>Accettati</th>
-                <th>Rifiutati</th>
-                <th>In attesa</th>
-                <th>Senza scelta</th>
-              </tr>
-            </thead>
-            <tbody>
-              {groups.map((g, i) => (
-                <tr key={`${g.province ?? '—'}-${g.type ?? '—'}-${i}`}>
-                  <td>{g.province ?? '—'}</td>
-                  <td>{g.type ?? '—'}</td>
-                  <td>{g.total ?? 0}</td>
-                  <td>{g.accept ?? 0}</td>
-                  <td>{g.deny ?? 0}</td>
-                  <td>{g.wait ?? 0}</td>
-                  <td>{g.emptyChoise ?? 0}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+    <CardsGrid>
+      {cards.map((c) => (
+        <SummaryCard key={c.label}>
+          <Value>{c.value.toLocaleString('it-IT')}</Value>
+          <Label>{c.label}</Label>
+          <Sub>{c.sub}</Sub>
+        </SummaryCard>
+      ))}
+    </CardsGrid>
   );
 }

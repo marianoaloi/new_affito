@@ -1,5 +1,5 @@
 import { baseApi } from '../../app/api';
-import type { ListingsQuery, ListingsResponse, StateMaloi } from '../../types';
+import type { ListingDetailDTO, ListingsQuery, ListingsResponse, StateMaloi } from '../../types';
 
 interface MutationResult {
   success: boolean;
@@ -15,6 +15,9 @@ export const listingsApi = baseApi.injectEndpoints({
     getListings: builder.query<ListingsResponse, ListingsQuery>({
       query: (params) => ({ url: 'listings', params }),
       providesTags: ['Listings'],
+    }),
+    getListingById: builder.query<ListingDetailDTO, number>({
+      query: (id) => ({ url: `listings/${id}` }),
     }),
     updateState: builder.mutation<MutationResult, { id: number; stateMaloi: StateMaloi }>({
       query: ({ id, stateMaloi }) => ({
@@ -45,6 +48,7 @@ export const listingsApi = baseApi.injectEndpoints({
 
 export const {
   useGetListingsQuery,
+  useGetListingByIdQuery,
   useUpdateStateMutation,
   useUpdateDescriptionMutation,
   useBulkUpdateStateMutation,

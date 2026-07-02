@@ -1,5 +1,47 @@
 export type StateMaloi = 0 | 1 | 2;
 
+export interface ListingPhoto {
+  id: number;
+  caption?: string;
+  urls: { thumb: string; small: string; medium: string; large: string };
+}
+
+export interface ListingDetailDTO extends ListingDTO {
+  photos: ListingPhoto[];
+  address?: string | null;
+  city?: string;
+  macrozone?: string | null;
+  microzone?: string | null;
+  availability?: string;
+  caption?: string;
+  propertyDescription?: string;
+  rooms?: string;
+  bathrooms?: string;
+  furniture?: string;
+  buildingYear?: number;
+  garage?: string;
+  condominiumExpenses?: string;
+  heatingExpenses?: string;
+  deposit?: string | null;
+  availableToStudents?: boolean;
+  heatingType?: string;
+  airConditioning?: string;
+  epi?: string | number;
+  epiUm?: string;
+  pricePerSquareMeter?: string;
+  hasBalcony?: boolean;
+  hasTerrace?: boolean;
+  hasCellar?: boolean;
+  hasGarden?: boolean;
+  hasPool?: boolean;
+  hasAlarm?: boolean;
+  hasVideoIntercom?: boolean;
+  hasSecureDoor?: boolean;
+  hasFiber?: boolean;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
 export interface ListingDTO {
   id: number;
   title: string;
@@ -17,6 +59,7 @@ export interface ListingDTO {
   elevator?: boolean;
   featureElevator?: string;
   accessibility?: number | null;
+  photo?: ListingPhoto;
 }
 
 export interface MapListingPhoto {
@@ -96,4 +139,24 @@ export interface SummaryResponse {
     wait: number;
     emptyChoise: number;
   };
+}
+
+export interface StatisticGroup {
+  province: string;
+  type: string;
+  total: number;
+  disable_si: number;
+  disable_no: number;
+  disable_senza: number;
+  state_si: number;
+  state_no: number;
+  state_cosi: number;
+  state_senza: number;
+  elevator_si: number;
+  elevator_no: number;
+  elevator_senza: number;
+}
+
+export interface StatisticResponse {
+  groups: StatisticGroup[];
 }

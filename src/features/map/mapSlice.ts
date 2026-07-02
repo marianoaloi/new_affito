@@ -76,29 +76,40 @@ export const selectMapFilters = (state: { map: MapState }) => state.map.filters;
 export const selectMapLoading = (state: { map: MapState }) => state.map.loading;
 export const selectMapError = (state: { map: MapState }) => state.map.error;
 
-export function selectFilteredListings(state: { map: MapState }): MapListingDTO[] {
-  const { allListings, filters } = state.map;
+interface SharedFilterSubset {
+  stateMaloi: string;
+  accessibility: string;
+  elevator: string;
+  terra: boolean;
+}
+
+export function selectFilteredListings(state: {
+  map: MapState;
+  sharedFilters: SharedFilterSubset;
+}): MapListingDTO[] {
+  const { allListings } = state.map;
+  const f = state.sharedFilters;
   return allListings.filter((l) => {
-    if (filters.stateMaloi !== '') {
-      if (filters.stateMaloi === 'empty') {
+    if (f.stateMaloi !== '') {
+      if (f.stateMaloi === 'empty') {
         if (l.stateMaloi != null) return false;
       } else {
-        const val = parseInt(filters.stateMaloi, 10);
+        const val = parseInt(f.stateMaloi, 10);
         if (l.stateMaloi !== val) return false;
       }
     }
-    if (filters.accessibility !== '') {
-      if (filters.accessibility === 'accessible' && l.accessibility !== 1) return false;
-      if (filters.accessibility === 'not_accessible' && l.accessibility !== 0) return false;
-      if (filters.accessibility === 'no_info' && l.accessibility != null) return false;
+    if (f.accessibility !== '') {
+      if (f.accessibility === 'accessible' && l.accessibility !== 1) return false;
+      if (f.accessibility === 'not_accessible' && l.accessibility !== 0) return false;
+      if (f.accessibility === 'no_info' && l.accessibility != null) return false;
     }
-    if (filters.elevator !== '') {
+    if (f.elevator !== '') {
       const elev = l.elevator ?? (l.featureElevator ? l.featureElevator.toLowerCase() !== 'no' : undefined);
-      if (filters.elevator === 'has' && !elev) return false;
-      if (filters.elevator === 'no' && elev !== false) return false;
-      if (filters.elevator === 'no_info' && elev != null) return false;
+      if (f.elevator === 'has' && !elev) return false;
+      if (f.elevator === 'no' && elev !== false) return false;
+      if (f.elevator === 'no_info' && elev != null) return false;
     }
-    if (filters.terra) {
+    if (f.terra) {
       const abbr = l.floor?.abbreviation ?? '';
       if (!abbr.toLowerCase().includes('t')) return false;
     }
