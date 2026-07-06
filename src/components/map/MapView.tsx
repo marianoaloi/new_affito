@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { MapListingDTO } from '../../types';
+import { NO_CHOICE_STATE, type MapListingDTO, type StateMaloiOrNone } from '../../types';
 import ListingPopup from './ListingPopup';
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -27,11 +27,11 @@ function makeIcon(color: 'red' | 'green' | 'yellow' | 'blue') {
   });
 }
 
-function pinColor(stateMaloi?: 0 | 1 | 2): 'red' | 'green' | 'yellow' | 'blue' {
+function pinColor(stateMaloi: StateMaloiOrNone): 'red' | 'green' | 'yellow' | 'blue' {
   if (stateMaloi === 0) return 'red';
   if (stateMaloi === 1) return 'green';
   if (stateMaloi === 2) return 'yellow';
-  return 'blue';
+  return 'blue'; // NO_CHOICE_STATE (-1) — senza scelta
 }
 
 const myLocationIcon = L.divIcon({
@@ -70,7 +70,7 @@ export default function MapView({ listings, center, zoom, myLocation }: MapViewP
         return (
           <Marker
             key={listing.id}
-            icon={makeIcon(pinColor(listing.stateMaloi))}
+            icon={makeIcon(pinColor(listing.stateMaloi ?? NO_CHOICE_STATE))}
             position={[latitude, longitude]}
           >
             <Popup maxWidth={400}>

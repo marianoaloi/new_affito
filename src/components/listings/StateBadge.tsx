@@ -1,19 +1,17 @@
-import type { StateMaloi } from '../../types';
+import { NO_CHOICE_STATE, type StateMaloiOrNone } from '../../types';
 
 interface StateBadgeProps {
-  state?: StateMaloi;
+  state?: StateMaloiOrNone;
 }
 
-const CONFIG: Record<StateMaloi, { label: string; className: string }> = {
+const CONFIG: Record<StateMaloiOrNone, { label: string; className: string }> = {
   0: { label: 'Non buono', className: 'badge badge-red' },
   1: { label: 'Buono', className: 'badge badge-green' },
   2: { label: 'Così così', className: 'badge badge-yellow' },
+  [NO_CHOICE_STATE]: { label: 'Senza scelta', className: 'badge badge-gray' },
 };
 
 export default function StateBadge({ state }: StateBadgeProps) {
-  if (state === undefined || !(state in CONFIG)) {
-    return <span className="badge badge-gray">—</span>;
-  }
-  const { label, className } = CONFIG[state];
+  const { label, className } = CONFIG[state ?? NO_CHOICE_STATE];
   return <span className={className}>{label}</span>;
 }

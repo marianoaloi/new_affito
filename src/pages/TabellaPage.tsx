@@ -112,9 +112,14 @@ function perM2(listing: ListingDTO): string | null {
 function chips(listing: ListingDTO): string[] {
   const out: string[] = [];
   if (listing.elevator) out.push('Ascensore');
-  if (listing.accessibility === 1) out.push('Accessibile');
   if (listing.floor?.abbreviation === 'T') out.push('Piano terra');
   return out;
+}
+
+function accessibilityChip(listing: ListingDTO): { icon: string; label: string } {
+  if (listing.accessibility === 1) return { icon: '♿', label: 'Accessibile' };
+  if (listing.accessibility === 0) return { icon: '❌', label: 'Non accessibile' };
+  return { icon: '🟡', label: 'Senza info' };
 }
 
 interface CardControlsProps {
@@ -185,6 +190,7 @@ function ClassicListingCard({ listing, onEditDescription, onOpenDetail }: CardCo
   });
   const sale = isSale(listing);
   const tags = chips(listing);
+  const accessibility = accessibilityChip(listing);
 
   return (
     <ClassicCard>
@@ -207,13 +213,12 @@ function ClassicListingCard({ listing, onEditDescription, onOpenDetail }: CardCo
           <CardPrice style={{ cursor: 'pointer' }}>{priceText(listing)}</CardPrice>
         </a>
         <CardSpecs>{specsText(listing)}</CardSpecs>
-        {tags.length > 0 && (
-          <ChipRow>
-            {tags.map((c) => (
-              <Chip key={c}>{c}</Chip>
-            ))}
-          </ChipRow>
-        )}
+        <ChipRow>
+          {tags.map((c) => (
+            <Chip key={c}>{c}</Chip>
+          ))}
+          <Chip>{accessibility.icon} {accessibility.label}</Chip>
+        </ChipRow>
         <ChipRow>
           <StateBadge state={stateMaloi} />
           <label>
@@ -239,6 +244,7 @@ function HorizListingCard({ listing, onEditDescription, onOpenDetail }: CardCont
   });
   const sale = isSale(listing);
   const m2 = perM2(listing);
+  const accessibility = accessibilityChip(listing);
 
   return (
     <HorizCard>
@@ -265,6 +271,9 @@ function HorizListingCard({ listing, onEditDescription, onOpenDetail }: CardCont
           {m2 ? ` · ${m2}` : ''}
         </CardSpecs>
         <ChipRow>
+          <Chip>{accessibility.icon} {accessibility.label}</Chip>
+        </ChipRow>
+        <ChipRow>
           <StateBadge state={stateMaloi} />
           <label>
             <SelectCheck
@@ -288,6 +297,7 @@ function CompactListingRow({ listing, onEditDescription, onOpenDetail }: CardCon
     onOpenDetail,
   });
   const sale = isSale(listing);
+  const accessibility = accessibilityChip(listing);
 
   return (
     <CompactRow>
@@ -309,6 +319,7 @@ function CompactListingRow({ listing, onEditDescription, onOpenDetail }: CardCon
         </CompactSub>
       </CompactMain>
       <CompactSpecs>{specsText(listing)}</CompactSpecs>
+      <Chip>{accessibility.icon} {accessibility.label}</Chip>
       <StateBadge state={stateMaloi} />
       <CardActionButtons isLoading={isLoading} setState={(s) => void setState(s)} edit={edit} />
       <a

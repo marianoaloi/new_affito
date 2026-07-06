@@ -1,5 +1,9 @@
 export type StateMaloi = 0 | 1 | 2;
 
+/** Display-only: -1 means "senza scelta" (no decision made yet). Never a valid write payload. */
+export type StateMaloiOrNone = StateMaloi | -1;
+export const NO_CHOICE_STATE = -1 as const;
+
 export interface ListingPhoto {
   id: number;
   caption?: string;

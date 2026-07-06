@@ -4,7 +4,7 @@ import { useUpdateStateMutation } from '../../features/listings/listingsApi';
 import { recordStateUpdate, selectDecision } from '../../features/decisions/decisionsSlice';
 import { addToast } from '../../features/ui/uiSlice';
 import StateBadge from './StateBadge';
-import type { ListingDTO, StateMaloi } from '../../types';
+import { NO_CHOICE_STATE, type ListingDTO, type StateMaloi } from '../../types';
 
 const eur = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
 
@@ -19,7 +19,7 @@ export default function ListingRow({ listing, onEditDescription }: ListingRowPro
   const decision = useAppSelector(selectDecision(listing.id));
   const [updateState, { isLoading }] = useUpdateStateMutation();
 
-  const stateMaloi = decision?.stateMaloi ?? listing.stateMaloi;
+  const stateMaloi = decision?.stateMaloi ?? listing.stateMaloi ?? NO_CHOICE_STATE;
   const description = decision?.description ?? listing.description ?? '';
   const checked = selectedIds.includes(listing.id);
 

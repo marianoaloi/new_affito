@@ -8,7 +8,7 @@ import {
 } from '../../features/listings/listingsApi';
 import { recordStateUpdate, recordDescriptionUpdate } from '../../features/decisions/decisionsSlice';
 import { addToast } from '../../features/ui/uiSlice';
-import type { ListingDetailDTO, StateMaloi } from '../../types';
+import { NO_CHOICE_STATE, type ListingDetailDTO, type StateMaloi } from '../../types';
 
 // ── Styled ─────────────────────────────────────────────────────────────────
 
@@ -165,7 +165,12 @@ function D({ label, value }: { label: string; value?: string | number | null }) 
   );
 }
 
-const STATE_LABELS: Record<number, string> = { 1: 'Buono', 2: 'Così così', 0: 'Non buono' };
+const STATE_LABELS: Record<number, string> = {
+  1: 'Buono',
+  2: 'Così così',
+  0: 'Non buono',
+  [NO_CHOICE_STATE]: 'Senza scelta',
+};
 
 function buildFeatures(d: ListingDetailDTO): string[] {
   const out: string[] = [];
@@ -199,7 +204,7 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
   const [localState, setLocalState] = useState<StateMaloi | undefined>(undefined);
 
   const description = note ?? data?.description ?? '';
-  const stateMaloi = localState !== undefined ? localState : data?.stateMaloi;
+  const stateMaloi = (localState !== undefined ? localState : data?.stateMaloi) ?? NO_CHOICE_STATE;
 
   const photos = data?.photos ?? [];
   const photo = photos[photoIdx];
@@ -274,9 +279,7 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
               {/* ── Price ── */}
               <PriceRow>
                 <DealBadge $sale={isSale}>{isSale ? 'Vendita' : 'Affitto'}</DealBadge>
-                <StateBadge $state={stateMaloi}>
-                  {stateMaloi != null ? (STATE_LABELS[stateMaloi] ?? '—') : 'Senza scelta'}
-                </StateBadge>
+                <StateBadge $state={stateMaloi}>{STATE_LABELS[stateMaloi]}</StateBadge>
                 <ImmoLink href={`https://www.immobiliare.it/annunci/${listingId}`} target="_blank" rel="noopener noreferrer">
                   Immobiliare.it ↗
                 </ImmoLink>
