@@ -78,3 +78,4 @@ specification/new_affitto/copilot/**
 functions/lib/**
 dist/**
 functions/**.pem
+.env.**
