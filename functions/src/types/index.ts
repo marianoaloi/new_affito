@@ -160,3 +160,15 @@ export interface StatisticGroup {
 export interface StatisticResponse {
   groups: StatisticGroup[];
 }
+
+export interface FeaturedListingDTO {
+  id: number;
+  title: string;
+  priceFormatted: string;
+  province: string;
+  type: string;
+  contractValue: string;
+  surfaceValue?: string;
+  floor?: { abbreviation?: string | null; value?: string };
+  photo?: ListingPhoto;
+}

@@ -1,13 +1,35 @@
 import { Router, Request, Response } from 'express';
 import { Document } from 'mongodb';
 import { getDb } from '../db/mongo';
-import { SummaryGroup, SummaryResponse, StatisticGroup, StatisticResponse } from '../types/index';
+import { SummaryGroup, SummaryResponse, StatisticGroup, StatisticResponse, FeaturedListingDTO } from '../types/index';
 
 const router = Router();
+
+const READ_COLLECTION = 'affitto_data';
+const FEATURED_LIMIT = 6;
+
+const FEATURED_PROJECTION = {
+  _id: 1,
+  type: 1,
+  'feature.province': 1,
+  'feature.type': 1,
+  'properties.surfaceValue': 1,
+  'properties.floor': 1,
+  'properties.photo': 1,
+  'realEstatePage.title': 1,
+  'realEstatePage.contractValue': 1,
+  'realEstatePage.price.formattedValue': 1,
+};
 
 function num(v: unknown): number {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
+}
+
+function mapType(raw: string): string {
+  if (raw === 'a') return 'Affito';
+  if (raw === 'c') return 'Compra';
+  return raw;
 }
 
 // GET /stats/summary — pre-aggregated stats from `count`
@@ -92,6 +114,38 @@ router.get('/stats/statistic', async (_req: Request, res: Response): Promise<voi
     res.json(response);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch statistic' });
+  }
+});
+
+// GET /featured — a handful of "buono" listings with a photo, for the public landing page
+router.get('/featured', async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const db = await getDb();
+    const docs = await db
+      .collection(READ_COLLECTION)
+      .find({ stateMaloi: 1, 'properties.photo': { $exists: true } })
+      .project(FEATURED_PROJECTION)
+      .sort({ mLastUpdate: -1 })
+      .limit(FEATURED_LIMIT)
+      .toArray();
+
+    const data: FeaturedListingDTO[] = docs.map((doc: Document) => ({
+      id: doc._id,
+      title: doc.realEstatePage?.title ?? '',
+      priceFormatted: doc.realEstatePage?.price?.formattedValue ?? '',
+      province: doc.feature?.province ?? '',
+      type: mapType(doc.feature?.type ?? doc.type ?? ''),
+      contractValue: doc.realEstatePage?.contractValue ?? '',
+      surfaceValue: doc.properties?.surfaceValue,
+      floor: doc.properties?.floor
+        ? { abbreviation: doc.properties.floor.abbreviation ?? null, value: doc.properties.floor.value }
+        : undefined,
+      photo: doc.properties?.photo,
+    }));
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch featured listings' });
   }
 });
 

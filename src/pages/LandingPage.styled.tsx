@@ -161,15 +161,14 @@ export const FeaturedCard = styled.div`
   flex-direction: column;
 `;
 
-export const CardImg = styled.div`
+export const CardImg = styled.div<{ $url?: string }>`
   height: 170px;
-  background: repeating-linear-gradient(
-    135deg,
-    #ecece6,
-    #ecece6 11px,
-    #f5f5f1 11px,
-    #f5f5f1 22px
-  );
+  background-image: ${({ $url }) =>
+    $url
+      ? `url(${$url})`
+      : `repeating-linear-gradient(135deg, #ecece6, #ecece6 11px, #f5f5f1 11px, #f5f5f1 22px)`};
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;

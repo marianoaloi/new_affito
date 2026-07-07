@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { SummaryResponse, StatisticResponse } from '../../types';
+import type { SummaryResponse, StatisticResponse, FeaturedListingDTO } from '../../types';
 
 export const statsApi = createApi({
   reducerPath: 'statsApi',
@@ -11,7 +11,10 @@ export const statsApi = createApi({
     getStatisticGroups: builder.query<StatisticResponse, void>({
       query: () => 'public/stats/statistic',
     }),
+    getFeatured: builder.query<FeaturedListingDTO[], void>({
+      query: () => 'public/featured',
+    }),
   }),
 });
 
-export const { useGetSummaryQuery, useGetStatisticGroupsQuery } = statsApi;
+export const { useGetSummaryQuery, useGetStatisticGroupsQuery, useGetFeaturedQuery } = statsApi;

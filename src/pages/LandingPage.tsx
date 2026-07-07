@@ -1,5 +1,5 @@
 import { useAuth } from '../features/auth/useAuth';
-import { useGetSummaryQuery } from '../features/stats/statsApi';
+import { useGetSummaryQuery, useGetFeaturedQuery } from '../features/stats/statsApi';
 import {
   LandingWrapper,
   TopBar,
@@ -32,7 +32,7 @@ import {
   CardMeta,
   DealBadge,
 } from './LandingPage.styled';
-import type { SummaryResponse } from '../types';
+import type { SummaryResponse, FeaturedListingDTO } from '../types';
 
 interface Stat {
   value: string;
@@ -70,33 +70,17 @@ function buildStats(data: SummaryResponse): Stat[] {
   ];
 }
 
-const FEATURED = [
-  {
-    title: 'Trilocale luminoso',
-    location: 'Udine · Centro',
-    sale: false,
-    price: '€ 780/mese',
-    meta: ['85 m²', '3 locali', '2014'],
-  },
-  {
-    title: 'Bilocale ristrutturato',
-    location: 'Trieste · Barriera',
-    sale: true,
-    price: '€ 145.000',
-    meta: ['58 m²', '2 locali', '1998'],
-  },
-  {
-    title: 'Attico con terrazza',
-    location: 'Padova · Arcella',
-    sale: false,
-    price: '€ 1.150/mese',
-    meta: ['120 m²', '4 locali', '2020'],
-  },
-];
+function featuredMeta(f: FeaturedListingDTO): string[] {
+  const parts: string[] = [];
+  if (f.surfaceValue) parts.push(`${f.surfaceValue} m²`);
+  if (f.floor?.abbreviation) parts.push(f.floor.abbreviation);
+  return parts;
+}
 
 export default function LandingPage() {
   const { isAuthenticated, signIn } = useAuth();
   const { data, isLoading, isError } = useGetSummaryQuery();
+  const { data: featured, isLoading: featuredLoading, isError: featuredError } = useGetFeaturedQuery();
 
   const stats = data ? buildStats(data) : [];
 
@@ -153,27 +137,41 @@ export default function LandingPage() {
         <SectionTitle>
           In evidenza <SectionSub>/ Featured</SectionSub>
         </SectionTitle>
-        <FeaturedGrid>
-          {FEATURED.map((f) => (
-            <FeaturedCard key={f.title}>
-              <CardImg>
-                <DealBadge $sale={f.sale}>
-                  {f.sale ? 'Vendita' : 'Affitto'}
-                </DealBadge>
-              </CardImg>
-              <CardBody>
-                <CardTitle>{f.title}</CardTitle>
-                <CardSub>{f.location}</CardSub>
-                <CardPrice>{f.price}</CardPrice>
-                <CardMeta>
-                  {f.meta.map((m) => (
-                    <span key={m}>{m}</span>
-                  ))}
-                </CardMeta>
-              </CardBody>
-            </FeaturedCard>
-          ))}
-        </FeaturedGrid>
+
+        {featuredLoading && (
+          <FeaturedGrid>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </FeaturedGrid>
+        )}
+
+        {!featuredLoading && !featuredError && featured && featured.length > 0 && (
+          <FeaturedGrid>
+            {featured.map((f) => (
+              <FeaturedCard key={f.id}>
+                <CardImg $url={f.photo?.urls.small}>
+                  <DealBadge $sale={f.type === 'Compra'}>
+                    {f.type === 'Compra' ? 'Vendita' : 'Affitto'}
+                  </DealBadge>
+                </CardImg>
+                <CardBody>
+                  <CardTitle>{f.title || '—'}</CardTitle>
+                  <CardSub>
+                    {f.province}
+                    {f.contractValue ? ` · ${f.contractValue}` : ''}
+                  </CardSub>
+                  <CardPrice>{f.priceFormatted || '—'}</CardPrice>
+                  <CardMeta>
+                    {featuredMeta(f).map((m) => (
+                      <span key={m}>{m}</span>
+                    ))}
+                  </CardMeta>
+                </CardBody>
+              </FeaturedCard>
+            ))}
+          </FeaturedGrid>
+        )}
       </SectionWrap>
     </LandingWrapper>
   );
