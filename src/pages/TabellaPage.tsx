@@ -18,6 +18,7 @@ import { addToast, setListingsCount } from '../features/ui/uiSlice';
 import BulkActionBar from '../components/listings/BulkActionBar';
 import DescriptionModal from '../components/listings/DescriptionModal';
 import ListingDetailModal from '../components/listings/ListingDetailModal';
+import PhotoGridModal from '../components/listings/PhotoGridModal';
 import StateBadge from '../components/listings/StateBadge';
 import type { ListingDTO, ListingsQuery, StateMaloi } from '../types';
 import {
@@ -126,9 +127,10 @@ interface CardControlsProps {
   listing: ListingDTO;
   onEditDescription: (id: number, description: string) => void;
   onOpenDetail: (listing: ListingDTO) => void;
+  onOpenPhotos: (listing: ListingDTO) => void;
 }
 
-function useCardControls({ listing, onEditDescription, onOpenDetail }: CardControlsProps) {
+function useCardControls({ listing, onEditDescription, onOpenDetail }: Omit<CardControlsProps, 'onOpenPhotos'>) {
   const dispatch = useAppDispatch();
   const selectedIds = useAppSelector(selectSelectedIds);
   const decision = useAppSelector(selectDecision(listing.id));
@@ -182,7 +184,7 @@ function CardActionButtons({
   );
 }
 
-function ClassicListingCard({ listing, onEditDescription, onOpenDetail }: CardControlsProps) {
+function ClassicListingCard({ listing, onEditDescription, onOpenDetail, onOpenPhotos }: CardControlsProps) {
   const { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
     listing,
     onEditDescription,
@@ -194,7 +196,11 @@ function ClassicListingCard({ listing, onEditDescription, onOpenDetail }: CardCo
 
   return (
     <ClassicCard>
-      <CardImg $url={listing.photo?.urls.small}>
+      <CardImg
+        $url={listing.photo?.urls.small}
+        onClick={listing.photo ? () => onOpenPhotos(listing) : undefined}
+        style={listing.photo ? { cursor: 'pointer' } : undefined}
+      >
         <DealBadge $sale={sale}>{dealLabel(listing)}</DealBadge>
         {!listing.photo && <CardImgText>foto</CardImgText>}
       </CardImg>
@@ -236,7 +242,7 @@ function ClassicListingCard({ listing, onEditDescription, onOpenDetail }: CardCo
   );
 }
 
-function HorizListingCard({ listing, onEditDescription, onOpenDetail }: CardControlsProps) {
+function HorizListingCard({ listing, onEditDescription, onOpenDetail, onOpenPhotos }: CardControlsProps) {
   const { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
     listing,
     onEditDescription,
@@ -248,7 +254,11 @@ function HorizListingCard({ listing, onEditDescription, onOpenDetail }: CardCont
 
   return (
     <HorizCard>
-      <HorizImg $url={listing.photo?.urls.small}>
+      <HorizImg
+        $url={listing.photo?.urls.small}
+        onClick={listing.photo ? () => onOpenPhotos(listing) : undefined}
+        style={listing.photo ? { cursor: 'pointer' } : undefined}
+      >
         <DealBadge $sale={sale}>{dealLabel(listing)}</DealBadge>
         {!listing.photo && <CardImgText>foto</CardImgText>}
       </HorizImg>
@@ -345,6 +355,7 @@ export default function TabellaPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [modal, setModal] = useState<ModalState | null>(null);
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [photoGridId, setPhotoGridId] = useState<number | null>(null);
 
   const query: ListingsQuery = {
     page,
@@ -380,13 +391,14 @@ export default function TabellaPage() {
 
   const onEditDescription = (id: number, description: string) => setModal({ id, description });
   const onOpenDetail = (listing: ListingDTO) => setDetailId(listing.id);
+  const onOpenPhotos = (listing: ListingDTO) => setPhotoGridId(listing.id);
 
   const renderCards = () => {
     if (cardStyle === 'horiz') {
       return (
         <HorizGrid>
           {rows.map((l) => (
-            <HorizListingCard key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} />
+            <HorizListingCard key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} onOpenPhotos={onOpenPhotos} />
           ))}
         </HorizGrid>
       );
@@ -395,7 +407,7 @@ export default function TabellaPage() {
       return (
         <CompactList>
           {rows.map((l) => (
-            <CompactListingRow key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} />
+            <CompactListingRow key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} onOpenPhotos={onOpenPhotos} />
           ))}
         </CompactList>
       );
@@ -403,7 +415,7 @@ export default function TabellaPage() {
     return (
       <ClassicGrid>
         {rows.map((l) => (
-          <ClassicListingCard key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} />
+          <ClassicListingCard key={l.id} listing={l} onEditDescription={onEditDescription} onOpenDetail={onOpenDetail} onOpenPhotos={onOpenPhotos} />
         ))}
       </ClassicGrid>
     );
@@ -518,6 +530,13 @@ export default function TabellaPage() {
         <ListingDetailModal
           listingId={detailId}
           onClose={() => setDetailId(null)}
+        />
+      )}
+
+      {photoGridId !== null && (
+        <PhotoGridModal
+          listingId={photoGridId}
+          onClose={() => setPhotoGridId(null)}
         />
       )}
     </PageContent>

@@ -9,6 +9,7 @@ import {
 import { recordStateUpdate, recordDescriptionUpdate } from '../../features/decisions/decisionsSlice';
 import { addToast } from '../../features/ui/uiSlice';
 import { NO_CHOICE_STATE, type ListingDetailDTO, type StateMaloi } from '../../types';
+import PhotoGridModal from './PhotoGridModal';
 
 // ── Styled ─────────────────────────────────────────────────────────────────
 
@@ -200,6 +201,7 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
   const [updateDescription, { isLoading: savingDesc }] = useUpdateDescriptionMutation();
 
   const [photoIdx, setPhotoIdx] = useState(0);
+  const [showPhotoGrid, setShowPhotoGrid] = useState(false);
   const [note, setNote] = useState<string | undefined>(undefined);
   const [localState, setLocalState] = useState<StateMaloi | undefined>(undefined);
 
@@ -254,7 +256,12 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
               <Gallery>
                 {photo ? (
                   <>
-                    <GalleryImg src={photo.urls.medium || photo.urls.small} alt={photo.caption ?? ''} />
+                    <GalleryImg
+                      src={photo.urls.medium || photo.urls.small}
+                      alt={photo.caption ?? ''}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setShowPhotoGrid(true)}
+                    />
                     {photos.length > 1 && (
                       <>
                         <GalleryNav $side="left" onClick={() => setPhotoIdx(i => (i - 1 + photos.length) % photos.length)}>‹</GalleryNav>
@@ -400,6 +407,11 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
             </>
           )}
         </Body>
+
+        {/* Nested inside Sheet so overlay clicks that close the grid don't bubble past Sheet's stopPropagation and close this modal too */}
+        {showPhotoGrid && (
+          <PhotoGridModal listingId={listingId} onClose={() => setShowPhotoGrid(false)} />
+        )}
       </Sheet>
     </Overlay>
   );
