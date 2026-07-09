@@ -26,9 +26,38 @@ const initialFilters: SharedFilters = {
   stateMaloi: '',
 };
 
+const STORAGE_KEY = 'affito.sharedFilters';
+
+function loadPersistedFilters(): SharedFilters {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return initialFilters;
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed !== 'object' || parsed === null) return initialFilters;
+    const out = { ...initialFilters };
+    for (const key of Object.keys(initialFilters) as (keyof SharedFilters)[]) {
+      const value = (parsed as Record<string, unknown>)[key];
+      if (value !== undefined && typeof value === typeof initialFilters[key]) {
+        (out as Record<string, unknown>)[key] = value;
+      }
+    }
+    return out;
+  } catch {
+    return initialFilters;
+  }
+}
+
+export function saveSharedFilters(filters: SharedFilters): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
+  } catch {
+    // storage unavailable (private mode / quota) — filters simply won't persist
+  }
+}
+
 const sharedFiltersSlice = createSlice({
   name: 'sharedFilters',
-  initialState: initialFilters,
+  initialState: loadPersistedFilters(),
   reducers: {
     setSharedFilter<K extends keyof SharedFilters>(
       state: SharedFilters,

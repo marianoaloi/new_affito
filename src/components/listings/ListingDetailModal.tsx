@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import { useAppDispatch } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { selectIsAdmin } from '../../features/auth/authSlice';
 import {
   useGetListingByIdQuery,
   useUpdateStateMutation,
@@ -10,6 +11,7 @@ import { recordStateUpdate, recordDescriptionUpdate } from '../../features/decis
 import { addToast } from '../../features/ui/uiSlice';
 import { NO_CHOICE_STATE, type ListingDetailDTO, type StateMaloi } from '../../types';
 import PhotoGridModal from './PhotoGridModal';
+import { googleMapsSearchUrl, googleMapsDirectionsUrl } from '../../utils/gmaps';
 
 // ── Styled ─────────────────────────────────────────────────────────────────
 
@@ -196,6 +198,7 @@ interface Props {
 
 export default function ListingDetailModal({ listingId, onClose }: Props) {
   const dispatch = useAppDispatch();
+  const isAdmin = useAppSelector(selectIsAdmin);
   const { data, isLoading, isError } = useGetListingByIdQuery(listingId);
   const [updateState, { isLoading: savingState }] = useUpdateStateMutation();
   const [updateDescription, { isLoading: savingDesc }] = useUpdateDescriptionMutation();
@@ -290,6 +293,28 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
                 <ImmoLink href={`https://www.immobiliare.it/annunci/${listingId}`} target="_blank" rel="noopener noreferrer">
                   Immobiliare.it ↗
                 </ImmoLink>
+                {data.latitude != null && data.longitude != null && (
+                  <>
+                    <ImmoLink
+                      style={{ marginLeft: 0 }}
+                      href={googleMapsSearchUrl(data.latitude, data.longitude)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Google Maps"
+                    >
+                      📍 Maps
+                    </ImmoLink>
+                    <ImmoLink
+                      style={{ marginLeft: 0 }}
+                      href={googleMapsDirectionsUrl(data.province, data.latitude, data.longitude)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Indicazioni"
+                    >
+                      🗺️ Indicazioni
+                    </ImmoLink>
+                  </>
+                )}
               </PriceRow>
               <Price>
                 {data.priceFormatted || '—'}
@@ -380,14 +405,18 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
                 <D label="Aggiornato (interno)" value={fmt(data.mLastUpdate)} />
               </Grid2>
 
-              {/* ── Valutazione ── */}
-              <Divider />
-              <SectionTitle>Valutazione</SectionTitle>
-              <ActionRow>
-                <ActionBtn $color="#16a34a" $active={stateMaloi === 1} disabled={savingState} onClick={() => void handleState(1)}>✓ Buono</ActionBtn>
-                <ActionBtn $color="#ca8a04" $active={stateMaloi === 2} disabled={savingState} onClick={() => void handleState(2)}>~ Così così</ActionBtn>
-                <ActionBtn $color="#dc2626" $active={stateMaloi === 0} disabled={savingState} onClick={() => void handleState(0)}>✕ Non buono</ActionBtn>
-              </ActionRow>
+              {/* ── Valutazione (solo admin — l'API rifiuta gli altri con 403) ── */}
+              {isAdmin && (
+                <>
+                  <Divider />
+                  <SectionTitle>Valutazione</SectionTitle>
+                  <ActionRow>
+                    <ActionBtn $color="#16a34a" $active={stateMaloi === 1} disabled={savingState} onClick={() => void handleState(1)}>✓ Buono</ActionBtn>
+                    <ActionBtn $color="#ca8a04" $active={stateMaloi === 2} disabled={savingState} onClick={() => void handleState(2)}>~ Così così</ActionBtn>
+                    <ActionBtn $color="#dc2626" $active={stateMaloi === 0} disabled={savingState} onClick={() => void handleState(0)}>✕ Non buono</ActionBtn>
+                  </ActionRow>
+                </>
+              )}
 
               {/* ── Note ── */}
               <Divider />

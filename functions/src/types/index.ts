@@ -12,6 +12,8 @@ export interface ListingDetailDTO extends ListingDTO {
   city?: string;
   macrozone?: string | null;
   microzone?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   availability?: string;
   caption?: string;
   propertyDescription?: string;

@@ -1,16 +1,13 @@
 import { useMap } from 'react-leaflet';
-import { useAppDispatch } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { selectIsAdmin } from '../../features/auth/authSlice';
 import { useUpdateStateMutation } from '../../features/listings/listingsApi';
 import { recordStateUpdate } from '../../features/decisions/decisionsSlice';
 import { updateListingStateMaloi } from '../../features/map/mapSlice';
 import { addToast } from '../../features/ui/uiSlice';
 import type { MapListingDTO, StateMaloi } from '../../types';
 import PhotoGallery from './PhotoGallery';
-
-const TRIESTE_POINT =
-  'Train+station+Trieste+Centrale,+Piazza+della+Libert%C3%A0,+11,+34132+Trieste+TS';
-const UDINE_POINT = 'V.le+Europa+Unita,+33100+Udine+UD';
-const PADOVA_POINT = 'Stazione+di+Padova,+Piazzale+della+Stazione,+35131+Padova+PD';
+import { googleMapsSearchUrl, googleMapsDirectionsUrl } from '../../utils/gmaps';
 
 function timeAgo(unixTs: number): string {
   if (!unixTs) return '—';
@@ -31,26 +28,18 @@ interface ListingPopupProps {
 export default function ListingPopup({ listing, onClose }: ListingPopupProps) {
   const dispatch = useAppDispatch();
   const map = useMap();
+  const isAdmin = useAppSelector(selectIsAdmin);
   const [updateState, { isLoading }] = useUpdateStateMutation();
 
   const { latitude, longitude } = listing.location;
 
   function openGoogleMaps() {
-    window.open(
-      `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
-      '_blank'
-    );
+    window.open(googleMapsSearchUrl(latitude ?? 0, longitude ?? 0), '_blank');
   }
 
   function openDirections() {
-    const origin =
-      listing.location.province === 'Udine'
-        ? UDINE_POINT
-        : listing.location.province === 'Padova'
-          ? PADOVA_POINT
-          : TRIESTE_POINT;
     window.open(
-      `https://www.google.com/maps/dir/${origin}/${latitude},${longitude}`,
+      googleMapsDirectionsUrl(listing.location.province, latitude ?? 0, longitude ?? 0),
       '_blank'
     );
   }
@@ -133,17 +122,19 @@ export default function ListingPopup({ listing, onClose }: ListingPopupProps) {
         </button>
       </div>
 
-      <div className="popup-state-btns">
-        <button className="btn-sm" disabled={isLoading} onClick={() => setState(1)}>
-          Buono 🟢
-        </button>
-        <button className="btn-sm" disabled={isLoading} onClick={() => setState(2)}>
-          Così così 🟡
-        </button>
-        <button className="btn-sm" disabled={isLoading} onClick={() => setState(0)}>
-          Non buono 🔴
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="popup-state-btns">
+          <button className="btn-sm" disabled={isLoading} onClick={() => setState(1)}>
+            Buono 🟢
+          </button>
+          <button className="btn-sm" disabled={isLoading} onClick={() => setState(2)}>
+            Così così 🟡
+          </button>
+          <button className="btn-sm" disabled={isLoading} onClick={() => setState(0)}>
+            Non buono 🔴
+          </button>
+        </div>
+      )}
 
       <PhotoGallery photos={listing.photos} />
     </div>
