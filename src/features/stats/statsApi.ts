@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { SummaryResponse, StatisticResponse, FeaturedListingDTO } from '../../types';
+import { baseApi } from '../../app/api';
+import type { SummaryResponse, StatisticResponse, FeaturedListingDTO, StatisticRawDoc } from '../../types';
 
 export const statsApi = createApi({
   reducerPath: 'statsApi',
@@ -18,3 +19,15 @@ export const statsApi = createApi({
 });
 
 export const { useGetSummaryQuery, useGetStatisticGroupsQuery, useGetFeaturedQuery } = statsApi;
+
+// Raw statistic docs need the Firebase token, so they ride on baseApi (authenticated),
+// not on the public statsApi above.
+export const rawStatsApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getStatisticRaw: builder.query<StatisticRawDoc[], void>({
+      query: () => 'stats/raw',
+    }),
+  }),
+});
+
+export const { useGetStatisticRawQuery } = rawStatsApi;

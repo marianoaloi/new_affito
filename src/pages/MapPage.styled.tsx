@@ -8,6 +8,9 @@ export const MapPageWrapper = styled.div`
 export const MapContainer = styled.div`
   position: absolute;
   inset: 0;
+  /* Trap Leaflet's internal z-indexes (controls use ~1000) so the mobile
+     filter drawer (950) and backdrop (900) always paint above the map */
+  z-index: 0;
 `;
 
 export const LegendOverlay = styled.div`

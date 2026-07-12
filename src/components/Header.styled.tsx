@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
+import { MOBILE_BP } from './layout/FilterSidebar.styled';
 
 export const HeaderWrapper = styled.header`
   height: 64px;
@@ -10,6 +11,11 @@ export const HeaderWrapper = styled.header`
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    padding: 0 12px;
+    gap: 8px;
+  }
 `;
 
 export const HeaderLogo = styled(Link)`
@@ -34,10 +40,54 @@ export const LogoIcon = styled.div`
   justify-content: center;
 `;
 
+export const LogoText = styled.span`
+  @media (max-width: 560px) {
+    display: none;
+  }
+`;
+
 export const HeaderNav = styled.nav`
   display: flex;
   gap: 26px;
   align-items: center;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    gap: 14px;
+  }
+`;
+
+export const FilterToggleBtn = styled.button`
+  display: none;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+    flex: none;
+  }
+`;
+
+export const FilterBadge = styled.span`
+  position: absolute;
+  top: 5px;
+  right: 3px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #28528c;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
 `;
 
 export const NavBtn = styled(Link)<{ $active: boolean }>`
@@ -60,6 +110,10 @@ export const UserInfo = styled.div`
   flex-direction: column;
   align-items: flex-end;
   line-height: 1.3;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    display: none;
+  }
 `;
 
 export const UserName = styled.span`

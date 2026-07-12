@@ -1,6 +1,9 @@
 import styled from '@emotion/styled';
 
-export const SidebarWrapper = styled.aside`
+/** Single source of truth for the mobile breakpoint (px). */
+export const MOBILE_BP = 768;
+
+export const SidebarWrapper = styled.aside<{ $open: boolean }>`
   width: 300px;
   flex: none;
   background: #fff;
@@ -10,6 +13,74 @@ export const SidebarWrapper = styled.aside`
   display: flex;
   flex-direction: column;
   gap: 22px;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    bottom: 0;
+    width: min(300px, 85vw);
+    z-index: 950;
+    box-shadow: ${({ $open }) => ($open ? '0 12px 40px rgba(0,0,0,.25)' : 'none')};
+    transform: translateX(${({ $open }) => ($open ? '0' : '-100%')});
+    transition: transform 0.25s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+`;
+
+export const Backdrop = styled.div`
+  display: none;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    display: block;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 900;
+  }
+`;
+
+export const SidebarCloseBtn = styled.button`
+  display: none;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: #f1f2ee;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 17px;
+    line-height: 1;
+    color: #5e6573;
+    cursor: pointer;
+  }
+`;
+
+export const MobileResultsBtn = styled.button`
+  display: none;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary, #28528c);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
 `;
 
 export const SidebarHeader = styled.div`

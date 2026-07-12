@@ -11,12 +11,14 @@ interface UiState {
   toasts: Toast[];
   modal: string | null;
   listingsCount: number;
+  sidebarOpen: boolean;
 }
 
 const initialState: UiState = {
   toasts: [],
   modal: null,
   listingsCount: 0,
+  sidebarOpen: false,
 };
 
 let toastCounter = 0;
@@ -41,12 +43,20 @@ const uiSlice = createSlice({
     setListingsCount(state, action: PayloadAction<number>) {
       state.listingsCount = action.payload;
     },
+    toggleSidebar(state) {
+      state.sidebarOpen = !state.sidebarOpen;
+    },
+    closeSidebar(state) {
+      state.sidebarOpen = false;
+    },
   },
 });
 
-export const { addToast, removeToast, openModal, closeModal, setListingsCount } = uiSlice.actions;
+export const { addToast, removeToast, openModal, closeModal, setListingsCount, toggleSidebar, closeSidebar } =
+  uiSlice.actions;
 export default uiSlice.reducer;
 
 export const selectToasts = (state: RootState): Toast[] => state.ui.toasts;
 export const selectModal = (state: RootState): string | null => state.ui.modal;
 export const selectListingsCount = (state: RootState): number => state.ui.listingsCount;
+export const selectSidebarOpen = (state: RootState): boolean => state.ui.sidebarOpen;
