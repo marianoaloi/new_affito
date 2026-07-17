@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { MapListingPhoto } from '../../types';
+import { PreviewContainer, PreviewImage } from './PhotoGallery.styled';
 
 interface PhotoGalleryProps {
   photos: MapListingPhoto[];
@@ -62,28 +63,9 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
       </div>
 
       {hover && (
-        <div
-          style={{
-            position: 'fixed',
-            left: hover.x,
-            top: hover.y,
-            width: PREVIEW_W,
-            height: PREVIEW_H,
-            zIndex: 9999,
-            borderRadius: 10,
-            overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-            border: '2px solid #fff',
-            pointerEvents: 'none',
-            background: '#1a1a1a',
-          }}
-        >
-          <img
-            src={hover.src}
-            alt=""
-            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-          />
-        </div>
+        <PreviewContainer $x={hover.x} $y={hover.y}>
+          <PreviewImage src={hover.src} alt="" />
+        </PreviewContainer>
       )}
 
       {photos.length > PER_PAGE && (

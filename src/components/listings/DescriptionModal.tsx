@@ -3,6 +3,15 @@ import { useAppDispatch } from '../../app/hooks';
 import { useUpdateDescriptionMutation } from '../../features/listings/listingsApi';
 import { recordDescriptionUpdate } from '../../features/decisions/decisionsSlice';
 import { addToast } from '../../features/ui/uiSlice';
+import {
+  ModalOverlay,
+  ModalBox,
+  ModalHeader,
+  ModalCloseBtn,
+  ModalLabel,
+  ModalTextarea,
+  ModalActions,
+} from './DescriptionModal.styled';
 
 interface DescriptionModalProps {
   listingId: number;
@@ -40,34 +49,31 @@ export default function DescriptionModal({
   };
 
   return (
-    <div className="modal-overlay" onMouseDown={handleClose}>
-      <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+    <ModalOverlay onMouseDown={handleClose}>
+      <ModalBox onMouseDown={(e) => e.stopPropagation()}>
+        <ModalHeader>
           <h3>Modifica descrizione</h3>
-          <button className="modal-close" onClick={handleClose} aria-label="Chiudi">
+          <ModalCloseBtn onClick={handleClose} aria-label="Chiudi">
             ×
-          </button>
-        </div>
-        <label className="modal-label" htmlFor="description-text">
-          Descrizione
-        </label>
-        <textarea
+          </ModalCloseBtn>
+        </ModalHeader>
+        <ModalLabel htmlFor="description-text">Descrizione</ModalLabel>
+        <ModalTextarea
           id="description-text"
-          className="modal-textarea"
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={6}
           disabled={isLoading}
         />
-        <div className="modal-actions">
+        <ModalActions>
           <button className="btn btn-secondary" onClick={handleClose} disabled={isLoading}>
             Annulla
           </button>
           <button className="btn btn-primary" onClick={() => void handleSave()} disabled={isLoading}>
             {isLoading ? 'Salvataggio…' : 'Salva'}
           </button>
-        </div>
-      </div>
-    </div>
+        </ModalActions>
+      </ModalBox>
+    </ModalOverlay>
   );
 }

@@ -23,9 +23,10 @@ function timeAgo(unixTs: number): string {
 interface ListingPopupProps {
   listing: MapListingDTO;
   onClose: () => void;
+  onOpenDetail: (id: number) => void;
 }
 
-export default function ListingPopup({ listing, onClose }: ListingPopupProps) {
+export default function ListingPopup({ listing, onClose, onOpenDetail }: ListingPopupProps) {
   const dispatch = useAppDispatch();
   const map = useMap();
   const isAdmin = useAppSelector(selectIsAdmin);
@@ -119,6 +120,9 @@ export default function ListingPopup({ listing, onClose }: ListingPopupProps) {
         </button>
         <button className="btn-sm" title="Indicazioni" onClick={openDirections}>
           🗺️
+        </button>
+        <button className="btn-sm" title="Dettagli" onClick={() => onOpenDetail(listing.id)}>
+          ℹ️
         </button>
       </div>
 
