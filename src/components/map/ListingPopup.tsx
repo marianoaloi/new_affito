@@ -8,17 +8,10 @@ import { addToast } from '../../features/ui/uiSlice';
 import type { MapListingDTO, StateMaloi } from '../../types';
 import PhotoGallery from './PhotoGallery';
 import { googleMapsSearchUrl, googleMapsDirectionsUrl } from '../../utils/gmaps';
+import { timeAgo, dataImportance } from '../../utils/timeAgo';
 
-function timeAgo(unixTs: number): string {
-  if (!unixTs) return '—';
-  const diff = Date.now() - unixTs * 1000;
-  const days = Math.floor(diff / 86400000);
-  if (days < 1) return 'oggi';
-  if (days < 30) return `${days}g fa`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}m fa`;
-  return `${Math.floor(months / 12)}a fa`;
-}
+// listing timestamps arrive as unix seconds; the util expects Date | string
+const toDate = (unixTs?: number) => (unixTs ? new Date(unixTs * 1000) : undefined);
 
 interface ListingPopupProps {
   listing: MapListingDTO;
@@ -103,11 +96,15 @@ export default function ListingPopup({ listing, onClose, onOpenDetail }: Listing
       </div>
       <div className="popup-field">
         <label>Pubblicato (Immobiliare)</label>
-        <span>{timeAgo(listing.createdAt)}</span>
+        <span title={dataImportance(toDate(listing.createdAt))}>
+          {timeAgo(toDate(listing.createdAt))}
+        </span>
       </div>
       <div className="popup-field">
         <label>Aggiornato (Immobiliare)</label>
-        <span>{timeAgo(listing.updatedAt)}</span>
+        <span title={dataImportance(toDate(listing.updatedAt))}>
+          {timeAgo(toDate(listing.updatedAt))}
+        </span>
       </div>
       <div className="popup-field">
         <label>Altitudine</label>
