@@ -7,6 +7,7 @@ import {
 import { useBulkUpdateStateMutation } from '../../features/listings/listingsApi';
 import { recordStateUpdate } from '../../features/decisions/decisionsSlice';
 import { addToast } from '../../features/ui/uiSlice';
+import { selectIsAdmin } from '../../features/auth/authSlice';
 import type { StateMaloi } from '../../types';
 
 const ACTIONS: { state: StateMaloi; label: string; className: string }[] = [
@@ -18,6 +19,7 @@ const ACTIONS: { state: StateMaloi; label: string; className: string }[] = [
 export default function BulkActionBar() {
   const dispatch = useAppDispatch();
   const selectedIds = useAppSelector(selectSelectedIds);
+  const isAdmin = useAppSelector(selectIsAdmin);
   const [bulkUpdateState, { isLoading }] = useBulkUpdateStateMutation();
   const [pending, setPending] = useState<StateMaloi | null>(null);
 
@@ -41,7 +43,7 @@ export default function BulkActionBar() {
       <span className="bulk-count">{selectedIds.length} selezionati</span>
       {pending === null ? (
         <>
-          {ACTIONS.map((a) => (
+          {isAdmin && ACTIONS.map((a) => (
             <button
               key={a.state}
               className={a.className}

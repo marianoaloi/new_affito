@@ -54,9 +54,10 @@ interface MapViewProps {
   center: [number, number];
   zoom: number;
   myLocation: GeolocationCoordinates | null;
+  onOpenDetail: (id: number) => void;
 }
 
-export default function MapView({ listings, center, zoom, myLocation }: MapViewProps) {
+export default function MapView({ listings, center, zoom, myLocation, onOpenDetail }: MapViewProps) {
   return (
     <MapContainer center={center} zoom={zoom} className="map-container">
       <TileLayer
@@ -74,7 +75,7 @@ export default function MapView({ listings, center, zoom, myLocation }: MapViewP
             position={[latitude, longitude]}
           >
             <Popup maxWidth={400}>
-              <ListingPopup listing={listing} onClose={() => {}} />
+              <ListingPopup listing={listing} onClose={() => {}} onOpenDetail={onOpenDetail} />
             </Popup>
           </Marker>
         );

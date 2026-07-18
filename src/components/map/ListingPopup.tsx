@@ -1,56 +1,39 @@
 import { useMap } from 'react-leaflet';
-import { useAppDispatch } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { selectIsAdmin } from '../../features/auth/authSlice';
 import { useUpdateStateMutation } from '../../features/listings/listingsApi';
 import { recordStateUpdate } from '../../features/decisions/decisionsSlice';
 import { updateListingStateMaloi } from '../../features/map/mapSlice';
 import { addToast } from '../../features/ui/uiSlice';
 import type { MapListingDTO, StateMaloi } from '../../types';
 import PhotoGallery from './PhotoGallery';
+import { googleMapsSearchUrl, googleMapsDirectionsUrl } from '../../utils/gmaps';
+import { timeAgo, dataImportance } from '../../utils/timeAgo';
 
-const TRIESTE_POINT =
-  'Train+station+Trieste+Centrale,+Piazza+della+Libert%C3%A0,+11,+34132+Trieste+TS';
-const UDINE_POINT = 'V.le+Europa+Unita,+33100+Udine+UD';
-const PADOVA_POINT = 'Stazione+di+Padova,+Piazzale+della+Stazione,+35131+Padova+PD';
-
-function timeAgo(unixTs: number): string {
-  if (!unixTs) return '—';
-  const diff = Date.now() - unixTs * 1000;
-  const days = Math.floor(diff / 86400000);
-  if (days < 1) return 'oggi';
-  if (days < 30) return `${days}g fa`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}m fa`;
-  return `${Math.floor(months / 12)}a fa`;
-}
+// listing timestamps arrive as unix seconds; the util expects Date | string
+const toDate = (unixTs?: number) => (unixTs ? new Date(unixTs * 1000) : undefined);
 
 interface ListingPopupProps {
   listing: MapListingDTO;
   onClose: () => void;
+  onOpenDetail: (id: number) => void;
 }
 
-export default function ListingPopup({ listing, onClose }: ListingPopupProps) {
+export default function ListingPopup({ listing, onClose, onOpenDetail }: ListingPopupProps) {
   const dispatch = useAppDispatch();
   const map = useMap();
+  const isAdmin = useAppSelector(selectIsAdmin);
   const [updateState, { isLoading }] = useUpdateStateMutation();
 
   const { latitude, longitude } = listing.location;
 
   function openGoogleMaps() {
-    window.open(
-      `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
-      '_blank'
-    );
+    window.open(googleMapsSearchUrl(latitude ?? 0, longitude ?? 0), '_blank');
   }
 
   function openDirections() {
-    const origin =
-      listing.location.province === 'Udine'
-        ? UDINE_POINT
-        : listing.location.province === 'Padova'
-          ? PADOVA_POINT
-          : TRIESTE_POINT;
     window.open(
-      `https://www.google.com/maps/dir/${origin}/${latitude},${longitude}`,
+      googleMapsDirectionsUrl(listing.location.province, latitude ?? 0, longitude ?? 0),
       '_blank'
     );
   }
@@ -113,11 +96,15 @@ export default function ListingPopup({ listing, onClose }: ListingPopupProps) {
       </div>
       <div className="popup-field">
         <label>Pubblicato (Immobiliare)</label>
-        <span>{timeAgo(listing.createdAt)}</span>
+        <span title={dataImportance(toDate(listing.createdAt))}>
+          {timeAgo(toDate(listing.createdAt))}
+        </span>
       </div>
       <div className="popup-field">
         <label>Aggiornato (Immobiliare)</label>
-        <span>{timeAgo(listing.updatedAt)}</span>
+        <span title={dataImportance(toDate(listing.updatedAt))}>
+          {timeAgo(toDate(listing.updatedAt))}
+        </span>
       </div>
       <div className="popup-field">
         <label>Altitudine</label>
@@ -131,19 +118,24 @@ export default function ListingPopup({ listing, onClose }: ListingPopupProps) {
         <button className="btn-sm" title="Indicazioni" onClick={openDirections}>
           🗺️
         </button>
+        <button className="btn-sm" title="Dettagli" onClick={() => onOpenDetail(listing.id)}>
+          ℹ️
+        </button>
       </div>
 
-      <div className="popup-state-btns">
-        <button className="btn-sm" disabled={isLoading} onClick={() => setState(1)}>
-          Buono 🟢
-        </button>
-        <button className="btn-sm" disabled={isLoading} onClick={() => setState(2)}>
-          Così così 🟡
-        </button>
-        <button className="btn-sm" disabled={isLoading} onClick={() => setState(0)}>
-          Non buono 🔴
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="popup-state-btns">
+          <button className="btn-sm" disabled={isLoading} onClick={() => setState(1)}>
+            Buono 🟢
+          </button>
+          <button className="btn-sm" disabled={isLoading} onClick={() => setState(2)}>
+            Così così 🟡
+          </button>
+          <button className="btn-sm" disabled={isLoading} onClick={() => setState(0)}>
+            Non buono 🔴
+          </button>
+        </div>
+      )}
 
       <PhotoGallery photos={listing.photos} />
     </div>

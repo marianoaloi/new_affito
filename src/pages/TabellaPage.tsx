@@ -9,6 +9,7 @@ import {
   toggleSelectId,
 } from '../features/listings/listingsSlice';
 import { selectSharedFilters } from '../features/shared/filtersSlice';
+import { selectIsAdmin } from '../features/auth/authSlice';
 import {
   useGetListingsQuery,
   useUpdateStateMutation,
@@ -166,17 +167,22 @@ function CardActionButtons({
   setState: (s: StateMaloi) => void;
   edit: () => void;
 }) {
+  const isAdmin = useAppSelector(selectIsAdmin);
   return (
     <CardActions>
-      <button className="btn-sm btn-green" disabled={isLoading} onClick={() => setState(1)} title="Buono">
-        ✓
-      </button>
-      <button className="btn-sm btn-red" disabled={isLoading} onClick={() => setState(0)} title="Non buono">
-        ✕
-      </button>
-      <button className="btn-sm btn-yellow" disabled={isLoading} onClick={() => setState(2)} title="Così così">
-        ~
-      </button>
+      {isAdmin && (
+        <>
+          <button className="btn-sm btn-green" disabled={isLoading} onClick={() => setState(1)} title="Buono">
+            ✓
+          </button>
+          <button className="btn-sm btn-red" disabled={isLoading} onClick={() => setState(0)} title="Non buono">
+            ✕
+          </button>
+          <button className="btn-sm btn-yellow" disabled={isLoading} onClick={() => setState(2)} title="Così così">
+            ~
+          </button>
+        </>
+      )}
       <button className="btn-sm btn-secondary" onClick={edit} title="Modifica descrizione">
         ✎
       </button>

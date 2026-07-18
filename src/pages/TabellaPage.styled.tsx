@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
+import { MOBILE_BP } from '../components/layout/FilterSidebar.styled';
 
 const hatch = `repeating-linear-gradient(
   45deg,
@@ -13,6 +14,10 @@ export const PageContent = styled.main`
   height: 100%;
   overflow-y: auto;
   padding: 26px 30px;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    padding: 16px 14px;
+  }
 `;
 
 export const PageHeader = styled.header`
@@ -103,6 +108,11 @@ export const ClassicGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
   gap: 22px;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
 `;
 
 export const ClassicCard = styled.div`
@@ -200,6 +210,11 @@ export const HorizGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
   gap: 18px;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
 `;
 
 export const HorizCard = styled.div`
@@ -213,6 +228,10 @@ export const HorizCard = styled.div`
 export const HorizImg = styled.div<{ $url?: string }>`
   width: 170px;
   flex: none;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    width: 120px;
+  }
   background-image: ${({ $url }) => ($url ? `url(${$url})` : hatch)};
   background-size: cover;
   background-position: center;
@@ -254,6 +273,12 @@ export const CompactRow = styled.div`
   align-items: center;
   gap: 18px;
   padding: 16px 20px;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 12px 14px;
+  }
 `;
 
 export const AccentBar = styled.div<{ $sale: boolean }>`
@@ -305,6 +330,11 @@ export const CompactPrice = styled.div`
   font-size: 18px;
   font-weight: 600;
   color: #181b22;
+
+  @media (max-width: ${MOBILE_BP}px) {
+    min-width: 0;
+    margin-left: auto;
+  }
 `;
 
 /* shared card pieces */

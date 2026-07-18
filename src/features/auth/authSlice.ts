@@ -37,7 +37,14 @@ const authSlice = createSlice({
 export const { setUser, setStatus } = authSlice.actions;
 export default authSlice.reducer;
 
+const ADMIN_EMAILS = ['mariano@aloi.com.br'];
+
 export const selectUser = (state: RootState): AuthUser | null => state.auth.user;
+// UX gate only — the API enforces this server-side with requireAdmin
+export const selectIsAdmin = (state: RootState): boolean => {
+  const email = state.auth.user?.email?.toLowerCase();
+  return !!email && ADMIN_EMAILS.includes(email);
+};
 export const selectIsAuthenticated = (state: RootState): boolean =>
   state.auth.status === 'authenticated';
 export const selectAuthStatus = (state: RootState): AuthStatus => state.auth.status;

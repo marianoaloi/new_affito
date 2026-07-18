@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
   selectSharedFilters,
   setSharedFilter,
   resetSharedFilters,
 } from '../../features/shared/filtersSlice';
+import { selectSidebarOpen, closeSidebar } from '../../features/ui/uiSlice';
 import type {
   AccessibilityFilter,
   ElevatorFilter,
@@ -22,6 +24,9 @@ import {
   CheckboxLabel,
   ResultsFooter,
   ResultsCount,
+  Backdrop,
+  SidebarCloseBtn,
+  MobileResultsBtn,
 } from './FilterSidebar.styled';
 
 interface FilterSidebarProps {
@@ -31,14 +36,35 @@ interface FilterSidebarProps {
 export default function FilterSidebar({ count }: FilterSidebarProps) {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectSharedFilters);
+  const open = useAppSelector(selectSidebarOpen);
+  const close = () => dispatch(closeSidebar());
+
+  // Mobile drawer: lock body scroll and close on Esc while open
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') dispatch(closeSidebar());
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open, dispatch]);
 
   return (
-    <SidebarWrapper>
+    <>
+      {open && <Backdrop onClick={close} aria-hidden="true" />}
+      <SidebarWrapper $open={open} id="filter-drawer" aria-label="Filtri">
       <SidebarHeader>
         <SidebarTitle>Filtri / Filters</SidebarTitle>
         <ResetButton type="button" onClick={() => dispatch(resetSharedFilters())}>
           Azzera
         </ResetButton>
+        <SidebarCloseBtn type="button" onClick={close} aria-label="Chiudi filtri">
+          ×
+        </SidebarCloseBtn>
       </SidebarHeader>
 
       <Section>
@@ -160,7 +186,11 @@ export default function FilterSidebar({ count }: FilterSidebarProps) {
 
       <ResultsFooter>
         <ResultsCount>{count}</ResultsCount> risultati
+        <MobileResultsBtn type="button" onClick={close}>
+          Vedi {count} risultati
+        </MobileResultsBtn>
       </ResultsFooter>
-    </SidebarWrapper>
+      </SidebarWrapper>
+    </>
   );
 }

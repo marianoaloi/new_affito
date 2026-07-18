@@ -11,6 +11,7 @@ import {
 } from '../features/map/mapSlice';
 import { selectSharedFilters } from '../features/shared/filtersSlice';
 import MapView from '../components/map/MapView';
+import ListingDetailModal from '../components/listings/ListingDetailModal';
 import {
   MapPageWrapper,
   MapContainer,
@@ -31,6 +32,7 @@ export default function MapPage() {
   const loading = useAppSelector(selectMapLoading);
   const error = useAppSelector(selectMapError);
   const [myLocation, setMyLocation] = useState<GeolocationCoordinates | null>(null);
+  const [detailId, setDetailId] = useState<number | null>(null);
 
   const [trigger] = useLazyGetMapListingsQuery();
 
@@ -70,8 +72,14 @@ export default function MapPage() {
           center={[center.lat, center.lng]}
           zoom={center.zoom}
           myLocation={myLocation}
+          onOpenDetail={setDetailId}
         />
       </MapContainer>
+
+      {/* Outside MapContainer: its z-index:0 stacking context would trap the modal below the drawer */}
+      {detailId !== null && (
+        <ListingDetailModal listingId={detailId} onClose={() => setDetailId(null)} />
+      )}
 
       {loading && <LoadingOverlay>Caricamento...</LoadingOverlay>}
 

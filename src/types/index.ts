@@ -17,6 +17,8 @@ export interface ListingDetailDTO extends ListingDTO {
   city?: string;
   macrozone?: string | null;
   microzone?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   // Specs
   availability?: string;
   caption?: string;
@@ -148,6 +150,33 @@ export interface FeaturedListingDTO {
   surfaceValue?: string;
   floor?: { abbreviation?: string | null; value?: string };
   photo?: ListingPhoto;
+}
+
+/**
+ * Raw `statistic` collection document, as-is — the front owns the transformation.
+ * Shape from schema-udine-statistic-standardJSON.json; non-finite doubles
+ * (NaN/Infinity) arrive as null after JSON serialization.
+ */
+export interface StatisticRawDoc extends Record<string, unknown> {
+  _id: number;
+  condominiumExpenses: number | null;
+  contractValue: string;
+  createdAt: number;
+  deposit: number | null;
+  epi: number | null;
+  price: number;
+  pricePerSquareMeter: number | null;
+  province: string;
+  surfaceValue: number | null;
+  type: string;
+  updatedAt: number;
+  // Optional fields
+  Accesso_per_disabili?: number;
+  elevator?: string;
+  energyClass?: string;
+  mCreateDate?: number | null;
+  mLastUpdate?: number | null;
+  stateMaloi?: StateMaloi;
 }
 
 export interface MapListingPhoto {

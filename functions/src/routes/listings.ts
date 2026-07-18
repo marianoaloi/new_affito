@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { Filter, Document } from 'mongodb';
 import { getDb } from '../db/mongo';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest, requireAdmin } from '../middleware/auth';
 import { ListingDTO, ListingDetailDTO, ListingPhoto, ListingsResponse, StateMaloi } from '../types/index';
 
 const router = Router();
@@ -184,6 +184,8 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
           'properties.location.city': 1,
           'properties.location.macrozone': 1,
           'properties.location.microzone': 1,
+          'properties.location.latitude': 1,
+          'properties.location.longitude': 1,
           // properties – media
           'properties.photo': 1,
           'properties.multimedia.photos': 1,
@@ -231,6 +233,8 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
       city: doc.properties?.location?.city,
       macrozone: doc.properties?.location?.macrozone ?? null,
       microzone: doc.properties?.location?.microzone ?? null,
+      latitude: doc.properties?.location?.latitude ?? null,
+      longitude: doc.properties?.location?.longitude ?? null,
       // Specs
       availability: doc.properties?.availability,
       caption: doc.properties?.caption,
@@ -273,7 +277,7 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
 });
 
 // PATCH /:id/state — update stateMaloi
-router.patch('/:id/state', async (req: AuthRequest, res: Response): Promise<void> => {
+router.patch('/:id/state', requireAdmin, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const id = parseInt(String(req.params.id), 10);
     if (Number.isNaN(id)) {
@@ -335,7 +339,7 @@ router.patch('/:id/description', async (req: AuthRequest, res: Response): Promis
 });
 
 // POST /bulk-state — bulk update stateMaloi
-router.post('/bulk-state', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/bulk-state', requireAdmin, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { ids, stateMaloi } = req.body ?? {};
     if (!Array.isArray(ids) || ids.length < 1 || ids.length > 500) {

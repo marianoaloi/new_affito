@@ -9,6 +9,21 @@ export interface AuthRequest extends Request {
   user?: admin.auth.DecodedIdToken;
 }
 
+const ADMIN_EMAILS = ['mariano@aloi.com.br'];
+
+export function requireAdmin(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): void {
+  const email = req.user?.email?.toLowerCase();
+  if (req.user?.email_verified && email && ADMIN_EMAILS.includes(email)) {
+    next();
+    return;
+  }
+  res.status(403).json({ error: 'Not authorized to change state' });
+}
+
 export async function authMiddleware(
   req: AuthRequest,
   res: Response,

@@ -3,8 +3,9 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import { useGetStatisticGroupsQuery } from '../features/stats/statsApi';
-import type { StatisticGroup } from '../types';
+import { useGetStatisticRawQuery } from '../features/stats/statsApi';
+import PivotTable, { normalizeElevator } from '../components/stats/PivotTable';
+import type { StatisticGroup, StatisticRawDoc } from '../types';
 import {
   PageContent, PageHeader, PageTitle, PageSubtitle,
   PanelStack, Panel, PanelTitle, PanelSub,
@@ -93,13 +94,48 @@ function DualChart({ title, sub, data, withCosi = false }: ChartPanelProps) {
   );
 }
 
-export default function StatsPage() {
-  const { data, isLoading, isError, refetch } = useGetStatisticGroupsQuery();
+function emptyGroup(province: string, type: string): StatisticGroup {
+  return {
+    province, type, total: 0,
+    disable_si: 0, disable_no: 0, disable_senza: 0,
+    state_si: 0, state_no: 0, state_cosi: 0, state_senza: 0,
+    elevator_si: 0, elevator_no: 0, elevator_senza: 0,
+  };
+}
 
-  const groups = useMemo<StatisticGroup[]>(
-    () => [...(data?.groups ?? [])].sort((a, b) => b.total - a.total),
-    [data?.groups],
-  );
+// Client-side replica of the old backend $group pipeline, fed by the raw collection.
+function groupDocs(docs: StatisticRawDoc[]): StatisticGroup[] {
+  const map = new Map<string, StatisticGroup>();
+  for (const d of docs) {
+    const key = `${d.province}|${d.type}`;
+    let g = map.get(key);
+    if (!g) {
+      g = emptyGroup(d.province ?? '', d.type ?? '');
+      map.set(key, g);
+    }
+    g.total++;
+
+    if (d.Accesso_per_disabili === 1) g.disable_si++;
+    else if (d.Accesso_per_disabili === 0) g.disable_no++;
+    else g.disable_senza++;
+
+    if (d.stateMaloi === 1) g.state_si++;
+    else if (d.stateMaloi === 0) g.state_no++;
+    else if (d.stateMaloi === 2) g.state_cosi++;
+    else g.state_senza++;
+
+    const elev = normalizeElevator(d.elevator);
+    if (elev === 'Sì') g.elevator_si++;
+    else if (elev === 'No') g.elevator_no++;
+    else g.elevator_senza++;
+  }
+  return [...map.values()].sort((a, b) => b.total - a.total);
+}
+
+export default function StatsPage() {
+  const { data, isLoading, isError, refetch } = useGetStatisticRawQuery();
+
+  const groups = useMemo<StatisticGroup[]>(() => groupDocs(data ?? []), [data]);
 
   const disableData = useMemo<Row[]>(
     () => groups.map((g) => ({ name: shortLabel(g), si: g.disable_si, senza: g.disable_senza, no: g.disable_no })),
@@ -151,6 +187,11 @@ export default function StatsPage() {
           sub="Property count distribution across provinces, segregated by elevator status"
           data={elevatorData}
         />
+        <Panel>
+          <PanelTitle>Pivot — analisi libera</PanelTitle>
+          <PanelSub>Incrocia due dimensioni della collection statistic e scegli la metrica da aggregare</PanelSub>
+          <PivotTable docs={data ?? []} />
+        </Panel>
       </PanelStack>
     </PageContent>
   );
