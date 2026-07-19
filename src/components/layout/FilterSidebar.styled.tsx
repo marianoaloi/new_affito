@@ -146,6 +146,75 @@ export const CheckboxLabel = styled.label`
   cursor: pointer;
 `;
 
+/* Double-handle range slider: two overlapping native ranges on one track */
+export const RangeWrap = styled.div`
+  position: relative;
+  height: 24px;
+`;
+
+export const RangeTrack = styled.div`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border, #e7e7e2);
+`;
+
+export const RangeFill = styled.div<{ $left: number; $right: number }>`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  border-radius: 2px;
+  background: #28528c;
+  left: ${({ $left }) => $left}%;
+  right: ${({ $right }) => $right}%;
+`;
+
+export const RangeInput = styled.input`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  pointer-events: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #28528c;
+    cursor: pointer;
+  }
+
+  &::-moz-range-thumb {
+    pointer-events: auto;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #28528c;
+    cursor: pointer;
+  }
+`;
+
+export const RangeLabels = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+`;
+
 export const ResultsFooter = styled.div`
   margin-top: auto;
   padding-top: 16px;

@@ -6,10 +6,11 @@ import {
   resetSharedFilters,
 } from '../../features/shared/filtersSlice';
 import { selectSidebarOpen, closeSidebar } from '../../features/ui/uiSlice';
-import type {
-  AccessibilityFilter,
-  ElevatorFilter,
-  StateMaloiFilter,
+import {
+  selectUpdatedAtBounds,
+  type AccessibilityFilter,
+  type ElevatorFilter,
+  type StateMaloiFilter,
 } from '../../features/map/mapSlice';
 import {
   SidebarWrapper,
@@ -22,6 +23,11 @@ import {
   SegmentBtn,
   SidebarSelect,
   CheckboxLabel,
+  RangeWrap,
+  RangeTrack,
+  RangeFill,
+  RangeInput,
+  RangeLabels,
   ResultsFooter,
   ResultsCount,
   Backdrop,
@@ -33,11 +39,49 @@ interface FilterSidebarProps {
   count: number;
 }
 
+const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
+const DAY = 86400;
+
+const fmtDay = (unixSec: number) =>
+  new Date(unixSec * 1000).toLocaleDateString('it-IT', {
+    day: '2-digit',
+    month: 'short',
+    year: '2-digit',
+  });
+
 export default function FilterSidebar({ count }: FilterSidebarProps) {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectSharedFilters);
+  const bounds = useAppSelector(selectUpdatedAtBounds);
   const open = useAppSelector(selectSidebarOpen);
   const close = () => dispatch(closeSidebar());
+
+  // Slider handles: 0 in redux means "inactive" — handle rests at the bound
+  const updFrom = bounds
+    ? filters.updFrom > 0
+      ? clamp(filters.updFrom, bounds.min, bounds.max)
+      : bounds.min
+    : 0;
+  const updTo = bounds
+    ? filters.updTo > 0
+      ? clamp(filters.updTo, bounds.min, bounds.max)
+      : bounds.max
+    : 0;
+
+  const setUpdFrom = (raw: number) => {
+    if (!bounds) return;
+    const value = Math.min(raw, updTo);
+    dispatch(setSharedFilter({ key: 'updFrom', value: value <= bounds.min ? 0 : value }));
+  };
+  const setUpdTo = (raw: number) => {
+    if (!bounds) return;
+    const value = Math.max(raw, updFrom);
+    dispatch(setSharedFilter({ key: 'updTo', value: value >= bounds.max ? 0 : value }));
+  };
+
+  const span = bounds ? Math.max(bounds.max - bounds.min, 1) : 1;
+  const fillLeft = bounds ? ((updFrom - bounds.min) / span) * 100 : 0;
+  const fillRight = bounds ? 100 - ((updTo - bounds.min) / span) * 100 : 0;
 
   // Mobile drawer: lock body scroll and close on Esc while open
   useEffect(() => {
@@ -183,6 +227,40 @@ export default function FilterSidebar({ count }: FilterSidebarProps) {
           <option value="empty">Senza scelta</option>
         </SidebarSelect>
       </Section>
+
+      {bounds && bounds.max > bounds.min && (
+        <Section>
+          <SectionLabel>Aggiornato / Updated</SectionLabel>
+          <RangeWrap>
+            <RangeTrack />
+            <RangeFill $left={fillLeft} $right={fillRight} />
+            <RangeInput
+              type="range"
+              min={bounds.min}
+              max={bounds.max}
+              step={DAY}
+              value={updFrom}
+              onChange={(e) => setUpdFrom(Number(e.target.value))}
+              aria-label="Aggiornato da"
+              style={{ zIndex: updFrom > (bounds.min + bounds.max) / 2 ? 4 : 3 }}
+            />
+            <RangeInput
+              type="range"
+              min={bounds.min}
+              max={bounds.max}
+              step={DAY}
+              value={updTo}
+              onChange={(e) => setUpdTo(Number(e.target.value))}
+              aria-label="Aggiornato fino a"
+              style={{ zIndex: 3 }}
+            />
+          </RangeWrap>
+          <RangeLabels>
+            <span>{fmtDay(updFrom)}</span>
+            <span>{fmtDay(updTo)}</span>
+          </RangeLabels>
+        </Section>
+      )}
 
       <ResultsFooter>
         <ResultsCount>{count}</ResultsCount> risultati

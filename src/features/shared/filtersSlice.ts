@@ -12,6 +12,9 @@ export interface SharedFilters {
   accessibility: AccessibilityFilter;
   terra: boolean;
   stateMaloi: StateMaloiFilter;
+  /** updatedAt range (unix seconds); 0 = handle at the slider's end, filter inactive */
+  updFrom: number;
+  updTo: number;
 }
 
 const initialFilters: SharedFilters = {
@@ -24,6 +27,8 @@ const initialFilters: SharedFilters = {
   accessibility: '',
   terra: false,
   stateMaloi: '',
+  updFrom: 0,
+  updTo: 0,
 };
 
 const STORAGE_KEY = 'affito.sharedFilters';

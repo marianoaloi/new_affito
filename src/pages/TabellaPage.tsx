@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setPage,
@@ -9,6 +9,7 @@ import {
   toggleSelectId,
 } from '../features/listings/listingsSlice';
 import { selectSharedFilters } from '../features/shared/filtersSlice';
+import { selectAllListings } from '../features/map/mapSlice';
 import { selectIsAdmin } from '../features/auth/authSlice';
 import {
   useGetListingsQuery,
@@ -378,11 +379,32 @@ export default function TabellaPage() {
 
   const { data, isLoading, isFetching, isError, refetch } = useGetListingsQuery(query);
 
+  // updatedAt range: redux-only filtering — the tabella DTO has no updatedAt,
+  // so rows are matched by id against the map listings already in the store.
+  // Rows whose updatedAt is unknown stay visible.
+  const mapListings = useAppSelector(selectAllListings);
+  const updById = useMemo(() => {
+    const byId = new Map<number, number>();
+    for (const l of mapListings) byId.set(l.id, l.updatedAt);
+    return byId;
+  }, [mapListings]);
+
+  const { updFrom, updTo } = sharedFilters;
+  const rows = useMemo(() => {
+    const all = data?.data ?? [];
+    if (updFrom <= 0 && updTo <= 0) return all;
+    return all.filter((r) => {
+      const upd = updById.get(r.id);
+      if (upd == null) return true;
+      if (updFrom > 0 && upd < updFrom) return false;
+      if (updTo > 0 && upd > updTo) return false;
+      return true;
+    });
+  }, [data?.data, updFrom, updTo, updById]);
+
   useEffect(() => {
     dispatch(setListingsCount(data?.total ?? 0));
   }, [data?.total, dispatch]);
-
-  const rows = data?.data ?? [];
   const totalPages = data?.pages ?? 1;
   const currentPage = data?.page ?? page;
 

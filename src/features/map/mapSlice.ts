@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { MapListingDTO } from '../../types';
 
 export type AccessibilityFilter = '' | 'accessible' | 'not_accessible' | 'no_info';
@@ -81,6 +81,8 @@ interface SharedFilterSubset {
   accessibility: string;
   elevator: string;
   terra: boolean;
+  updFrom: number;
+  updTo: number;
 }
 
 export function selectFilteredListings(state: {
@@ -113,8 +115,28 @@ export function selectFilteredListings(state: {
       const abbr = l.floor?.abbreviation ?? '';
       if (!abbr.toLowerCase().includes('t')) return false;
     }
+    if (f.updFrom > 0 && l.updatedAt < f.updFrom) return false;
+    if (f.updTo > 0 && l.updatedAt > f.updTo) return false;
     return true;
   });
 }
+
+/**
+ * Slider bounds: min/max of updatedAt across the listings currently in redux.
+ * null until map data has been loaded.
+ */
+export const selectUpdatedAtBounds = createSelector(
+  [selectAllListings],
+  (listings): { min: number; max: number } | null => {
+    let min = Infinity;
+    let max = -Infinity;
+    for (const l of listings) {
+      if (!l.updatedAt) continue;
+      if (l.updatedAt < min) min = l.updatedAt;
+      if (l.updatedAt > max) max = l.updatedAt;
+    }
+    return Number.isFinite(min) && Number.isFinite(max) ? { min, max } : null;
+  }
+);
 
 export default mapSlice.reducer;
