@@ -52,6 +52,7 @@ export interface ListingDetailDTO extends ListingDTO {
   // Dates
   createdAt?: number;
   updatedAt?: number;
+  elevation?: number;
 }
 
 export interface ListingDTO {

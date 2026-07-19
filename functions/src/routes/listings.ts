@@ -16,6 +16,7 @@ const PROJECTION = {
   description: 1,
   stateMaloi: 1,
   mLastUpdate: 1,
+  elevation: 1,
   'feature.province': 1,
   'feature.type': 1,
   'feature.featureList.elevator': 1,
@@ -55,6 +56,7 @@ function toDTO(doc: Document): ListingDTO {
       ? { abbreviation: doc.properties.floor.abbreviation ?? null, value: doc.properties.floor.value }
       : undefined,
     elevator: doc.properties?.elevator,
+    elevation:doc?.elevation,
     featureElevator: doc.feature?.featureList?.elevator,
     accessibility: doc.feature?.primaryFeatures?.Accesso_per_disabili ?? null,
     photo: doc.properties?.photo,

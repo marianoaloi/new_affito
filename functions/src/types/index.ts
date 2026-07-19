@@ -62,6 +62,7 @@ export interface ListingDTO {
   featureElevator?: string;
   accessibility?: number | null;
   photo?: ListingPhoto;
+  elevation?:number;
 }
 
 export interface MapListingPhoto {
