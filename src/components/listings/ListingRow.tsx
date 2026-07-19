@@ -51,7 +51,7 @@ export default function ListingRow({ listing, onEditDescription }: ListingRowPro
       <td>{listing.title ?? '—'}</td>
       <td>{price}</td>
       <td>{listing.energyClass ?? '—'}</td>
-      <td>{listing.surfaceValue ? `${listing.surfaceValue} m²` : '—'}</td>
+      <td>{listing.surfaceValue ? `${listing.surfaceValue}` : '—'}</td>
       <td>{listing.contractValue ?? '—'}</td>
       <td>
         <StateBadge state={stateMaloi} />

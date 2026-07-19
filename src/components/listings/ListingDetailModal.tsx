@@ -234,7 +234,7 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
               <Divider />
               <SectionTitle>Caratteristiche principali</SectionTitle>
               <Grid2>
-                <D label="Superficie" value={data.surfaceValue ? `${data.surfaceValue} m²` : undefined} />
+                <D label="Superficie" value={data.surfaceValue ? `${data.surfaceValue}` : undefined} />
                 <D label="Locali" value={data.rooms} />
                 <D label="Bagni" value={data.bathrooms} />
                 <D label="Piano" value={data.floor?.value} />

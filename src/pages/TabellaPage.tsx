@@ -98,7 +98,7 @@ function dealLabel(listing: ListingDTO): string {
 
 function specsText(listing: ListingDTO): string {
   const parts: string[] = [];
-  if (listing.surfaceValue) parts.push(`${listing.surfaceValue}m²`);
+  if (listing.surfaceValue) parts.push(`${listing.surfaceValue}`);
   if (listing.floor?.value) parts.push(listing.floor.value);
   if (listing.energyClass) parts.push(listing.energyClass);
   return parts.length ? parts.join(' · ') : '—';

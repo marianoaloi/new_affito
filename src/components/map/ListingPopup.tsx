@@ -88,7 +88,7 @@ export default function ListingPopup({ listing, onClose, onOpenDetail }: Listing
       </div>
       <div className="popup-field">
         <label>Superficie</label>
-        <span>{listing.surfaceValue ? `${listing.surfaceValue} m²` : '—'}</span>
+        <span>{listing.surfaceValue ? `${listing.surfaceValue}` : '—'}</span>
       </div>
       <div className="popup-field">
         <label>Accessibilità</label>

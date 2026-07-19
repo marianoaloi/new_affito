@@ -72,7 +72,7 @@ function buildStats(data: SummaryResponse): Stat[] {
 
 function featuredMeta(f: FeaturedListingDTO): string[] {
   const parts: string[] = [];
-  if (f.surfaceValue) parts.push(`${f.surfaceValue} m²`);
+  if (f.surfaceValue) parts.push(`${f.surfaceValue}`);
   if (f.floor?.abbreviation) parts.push(f.floor.abbreviation);
   return parts;
 }
