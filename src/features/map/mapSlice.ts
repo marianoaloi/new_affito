@@ -121,21 +121,26 @@ export function selectFilteredListings(state: {
   });
 }
 
+const DAY = 86400;
+
 /**
- * Slider bounds: min/max of updatedAt across the listings currently in redux.
- * null until map data has been loaded.
+ * Distinct days (unix seconds, day start, ascending) with at least one listing
+ * updated on that day, across the listings currently in redux, plus tomorrow's
+ * day-start pinned as the upper end. The slider is index-based over this array,
+ * so sparse/old outliers don't stretch the track. Tomorrow (rather than the
+ * newest updatedAt found) is always the max so "today" is never cut short —
+ * an update posted later today still falls inside the max-selected range.
  */
-export const selectUpdatedAtBounds = createSelector(
+export const selectUpdatedAtDays = createSelector(
   [selectAllListings],
-  (listings): { min: number; max: number } | null => {
-    let min = Infinity;
-    let max = -Infinity;
+  (listings): number[] => {
+    const days = new Set<number>();
     for (const l of listings) {
-      if (!l.updatedAt) continue;
-      if (l.updatedAt < min) min = l.updatedAt;
-      if (l.updatedAt > max) max = l.updatedAt;
+      if (l.updatedAt) days.add(Math.floor(l.updatedAt / DAY) * DAY);
     }
-    return Number.isFinite(min) && Number.isFinite(max) ? { min, max } : null;
+    const todayStart = Math.floor(Date.now() / 1000 / DAY) * DAY;
+    days.add(todayStart + DAY);
+    return [...days].sort((a, b) => a - b);
   }
 );
 

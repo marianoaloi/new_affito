@@ -209,10 +209,25 @@ export const RangeInput = styled.input`
 export const RangeLabels = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 4px;
+  gap: 8px;
+  margin-top: 6px;
+`;
+
+export const DateInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--border, #e7e7e2);
+  border-radius: 8px;
+  padding: 5px 6px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--text, #181b22);
+  background: #fff;
+
+  &:focus {
+    outline: none;
+    border-color: #28528c;
+  }
 `;
 
 export const ResultsFooter = styled.div`

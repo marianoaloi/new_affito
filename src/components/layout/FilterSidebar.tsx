@@ -7,7 +7,7 @@ import {
 } from '../../features/shared/filtersSlice';
 import { selectSidebarOpen, closeSidebar } from '../../features/ui/uiSlice';
 import {
-  selectUpdatedAtBounds,
+  selectUpdatedAtDays,
   type AccessibilityFilter,
   type ElevatorFilter,
   type StateMaloiFilter,
@@ -28,6 +28,7 @@ import {
   RangeFill,
   RangeInput,
   RangeLabels,
+  DateInput,
   ResultsFooter,
   ResultsCount,
   Backdrop,
@@ -39,49 +40,80 @@ interface FilterSidebarProps {
   count: number;
 }
 
-const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
 const DAY = 86400;
 
-const fmtDay = (unixSec: number) =>
-  new Date(unixSec * 1000).toLocaleDateString('it-IT', {
-    day: '2-digit',
-    month: 'short',
-    year: '2-digit',
-  });
+/** Day-start unix seconds → "YYYY-MM-DD" (UTC, matching the day bucketing). */
+const toISODay = (unixSec: number) => new Date(unixSec * 1000).toISOString().slice(0, 10);
+
+/** "YYYY-MM-DD" → day-start unix seconds (UTC), or null when unparsable. */
+function fromISODay(value: string): number | null {
+  const ms = Date.parse(`${value}T00:00:00Z`);
+  return Number.isNaN(ms) ? null : Math.floor(ms / 1000);
+}
+
+/** First index whose day >= ts, or fallback when none. */
+function firstDayGE(days: number[], ts: number, fallback: number): number {
+  const i = days.findIndex((d) => d >= ts);
+  return i === -1 ? fallback : i;
+}
+
+/** Last index whose day <= ts, or fallback when none. */
+function lastDayLE(days: number[], ts: number, fallback: number): number {
+  let ans = fallback;
+  for (let i = 0; i < days.length; i++) {
+    if (days[i] <= ts) ans = i;
+    else break;
+  }
+  return ans;
+}
 
 export default function FilterSidebar({ count }: FilterSidebarProps) {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectSharedFilters);
-  const bounds = useAppSelector(selectUpdatedAtBounds);
+  const days = useAppSelector(selectUpdatedAtDays);
   const open = useAppSelector(selectSidebarOpen);
   const close = () => dispatch(closeSidebar());
 
-  // Slider handles: 0 in redux means "inactive" — handle rests at the bound
-  const updFrom = bounds
-    ? filters.updFrom > 0
-      ? clamp(filters.updFrom, bounds.min, bounds.max)
-      : bounds.min
-    : 0;
-  const updTo = bounds
-    ? filters.updTo > 0
-      ? clamp(filters.updTo, bounds.min, bounds.max)
-      : bounds.max
-    : 0;
+  // Index-based slider over the distinct days present in the data (data-density
+  // scale: no dead zones between sparse dates). Redux keeps unix seconds:
+  // updFrom = day start, updTo = day end; 0 = inactive (handle at the end).
+  const last = days.length - 1;
+  const toIdxRaw = filters.updTo > 0 ? lastDayLE(days, filters.updTo, last) : last;
+  const fromIdx = Math.min(
+    filters.updFrom > 0 ? firstDayGE(days, filters.updFrom, 0) : 0,
+    toIdxRaw
+  );
+  const toIdx = Math.max(toIdxRaw, fromIdx);
 
-  const setUpdFrom = (raw: number) => {
-    if (!bounds) return;
-    const value = Math.min(raw, updTo);
-    dispatch(setSharedFilter({ key: 'updFrom', value: value <= bounds.min ? 0 : value }));
+  const setFromIdx = (raw: number) => {
+    const idx = Math.min(raw, toIdx);
+    dispatch(setSharedFilter({ key: 'updFrom', value: idx <= 0 ? 0 : days[idx] }));
   };
-  const setUpdTo = (raw: number) => {
-    if (!bounds) return;
-    const value = Math.max(raw, updFrom);
-    dispatch(setSharedFilter({ key: 'updTo', value: value >= bounds.max ? 0 : value }));
+  const setToIdx = (raw: number) => {
+    const idx = Math.max(raw, fromIdx);
+    dispatch(setSharedFilter({ key: 'updTo', value: idx >= last ? 0 : days[idx] + DAY - 1 }));
   };
 
-  const span = bounds ? Math.max(bounds.max - bounds.min, 1) : 1;
-  const fillLeft = bounds ? ((updFrom - bounds.min) / span) * 100 : 0;
-  const fillRight = bounds ? 100 - ((updTo - bounds.min) / span) * 100 : 0;
+  // Typed exact dates: clamped to the data range and to from <= to;
+  // a date at (or beyond) the ends stores 0 = inactive.
+  const onFromDate = (value: string) => {
+    const ts = fromISODay(value);
+    if (ts == null || days.length === 0) return;
+    const clamped = Math.min(Math.max(ts, days[0]), days[toIdx]);
+    dispatch(setSharedFilter({ key: 'updFrom', value: clamped <= days[0] ? 0 : clamped }));
+  };
+  const onToDate = (value: string) => {
+    const ts = fromISODay(value);
+    if (ts == null || days.length === 0) return;
+    const clamped = Math.min(Math.max(ts, days[fromIdx]), days[last]);
+    dispatch(
+      setSharedFilter({ key: 'updTo', value: clamped >= days[last] ? 0 : clamped + DAY - 1 })
+    );
+  };
+
+  const span = Math.max(last, 1);
+  const fillLeft = (fromIdx / span) * 100;
+  const fillRight = 100 - (toIdx / span) * 100;
 
   // Mobile drawer: lock body scroll and close on Esc while open
   useEffect(() => {
@@ -228,7 +260,7 @@ export default function FilterSidebar({ count }: FilterSidebarProps) {
         </SidebarSelect>
       </Section>
 
-      {bounds && bounds.max > bounds.min && (
+      {days.length > 1 && (
         <Section>
           <SectionLabel>Aggiornato / Updated</SectionLabel>
           <RangeWrap>
@@ -236,28 +268,42 @@ export default function FilterSidebar({ count }: FilterSidebarProps) {
             <RangeFill $left={fillLeft} $right={fillRight} />
             <RangeInput
               type="range"
-              min={bounds.min}
-              max={bounds.max}
-              step={DAY}
-              value={updFrom}
-              onChange={(e) => setUpdFrom(Number(e.target.value))}
+              min={0}
+              max={last}
+              step={1}
+              value={fromIdx}
+              onChange={(e) => setFromIdx(Number(e.target.value))}
               aria-label="Aggiornato da"
-              style={{ zIndex: updFrom > (bounds.min + bounds.max) / 2 ? 4 : 3 }}
+              style={{ zIndex: fromIdx > last / 2 ? 4 : 3 }}
             />
             <RangeInput
               type="range"
-              min={bounds.min}
-              max={bounds.max}
-              step={DAY}
-              value={updTo}
-              onChange={(e) => setUpdTo(Number(e.target.value))}
+              min={0}
+              max={last}
+              step={1}
+              value={toIdx}
+              onChange={(e) => setToIdx(Number(e.target.value))}
               aria-label="Aggiornato fino a"
               style={{ zIndex: 3 }}
             />
           </RangeWrap>
           <RangeLabels>
-            <span>{fmtDay(updFrom)}</span>
-            <span>{fmtDay(updTo)}</span>
+            <DateInput
+              type="date"
+              value={toISODay(days[fromIdx])}
+              min={toISODay(days[0])}
+              max={toISODay(days[last])}
+              onChange={(e) => onFromDate(e.target.value)}
+              aria-label="Aggiornato dal giorno"
+            />
+            <DateInput
+              type="date"
+              value={toISODay(days[toIdx])}
+              min={toISODay(days[0])}
+              max={toISODay(days[last])}
+              onChange={(e) => onToDate(e.target.value)}
+              aria-label="Aggiornato fino al giorno"
+            />
           </RangeLabels>
         </Section>
       )}
