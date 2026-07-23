@@ -23,6 +23,7 @@ import ListingDetailModal from '../components/listings/ListingDetailModal';
 import PhotoGridModal from '../components/listings/PhotoGridModal';
 import StateBadge from '../components/listings/StateBadge';
 import type { ListingDTO, ListingsQuery, StateMaloi } from '../types';
+import { getAccessibilityIcon } from '../utils/accessibility';
 import {
   PageContent,
   PageHeader,
@@ -115,14 +116,8 @@ function perM2(listing: ListingDTO): string | null {
 function chips(listing: ListingDTO): string[] {
   const out: string[] = [];
   if (listing.elevator) out.push('Ascensore');
-  if (listing.floor?.abbreviation === 'T') out.push('Piano terra');
+  if (listing.floor?.abbreviation?.includes('T')) out.push('Piano terra');
   return out;
-}
-
-function accessibilityChip(listing: ListingDTO): { icon: string; label: string } {
-  if (listing.accessibility === 1) return { icon: '♿', label: 'Accessibile' };
-  if (listing.accessibility === 0) return { icon: '❌', label: 'Non accessibile' };
-  return { icon: '🟡', label: 'Senza info' };
 }
 
 interface CardControlsProps {
@@ -199,7 +194,7 @@ function ClassicListingCard({ listing, onEditDescription, onOpenDetail, onOpenPh
   });
   const sale = isSale(listing);
   const tags = chips(listing);
-  const accessibility = accessibilityChip(listing);
+  const accessibility = getAccessibilityIcon(listing);
 
   return (
     <ClassicCard>
@@ -257,7 +252,7 @@ function HorizListingCard({ listing, onEditDescription, onOpenDetail, onOpenPhot
   });
   const sale = isSale(listing);
   const m2 = perM2(listing);
-  const accessibility = accessibilityChip(listing);
+  const accessibility = getAccessibilityIcon(listing);
 
   return (
     <HorizCard>
@@ -314,7 +309,7 @@ function CompactListingRow({ listing, onEditDescription, onOpenDetail }: CardCon
     onOpenDetail,
   });
   const sale = isSale(listing);
-  const accessibility = accessibilityChip(listing);
+  const accessibility = getAccessibilityIcon(listing);
 
   return (
     <CompactRow>

@@ -9,6 +9,7 @@ import type { MapListingDTO, StateMaloi } from '../../types';
 import PhotoGallery from './PhotoGallery';
 import { googleMapsSearchUrl, googleMapsDirectionsUrl } from '../../utils/gmaps';
 import { timeAgo, dataImportance } from '../../utils/timeAgo';
+import { getAccessibilityIcon } from '../../utils/accessibility';
 
 // listing timestamps arrive as unix seconds; the util expects Date | string
 const toDate = (unixTs?: number) => (unixTs ? new Date(unixTs * 1000) : undefined);
@@ -55,8 +56,7 @@ export default function ListingPopup({ listing, onClose, onOpenDetail }: Listing
     listing.featureElevator ??
     (listing.elevator ? 'Sì' : listing.elevator === false ? 'No' : '—');
 
-  const accessibilita =
-    listing.accessibility === 1 ? '♿' : listing.accessibility === 0 ? '❌' : '🟡';
+  const accessibilita = getAccessibilityIcon(listing).icon;
 
   return (
     <div className="popup-content">
