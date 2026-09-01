@@ -10,6 +10,7 @@ import {
   selectMapError,
 } from '../features/map/mapSlice';
 import { selectSharedFilters } from '../features/shared/filtersSlice';
+import { refreshDone, selectRefreshNonce } from '../features/ui/uiSlice';
 import MapView from '../components/map/MapView';
 import ListingDetailModal from '../components/listings/ListingDetailModal';
 import {
@@ -33,6 +34,7 @@ export default function MapPage() {
   const error = useAppSelector(selectMapError);
   const [myLocation, setMyLocation] = useState<GeolocationCoordinates | null>(null);
   const [detailId, setDetailId] = useState<number | null>(null);
+  const refreshNonce = useAppSelector(selectRefreshNonce);
 
   const [trigger] = useLazyGetMapListingsQuery();
 
@@ -41,16 +43,20 @@ export default function MapPage() {
     try {
       const province = sharedFilters.province || 'Udine';
       const type = sharedFilters.deal || undefined;
-      const data = await trigger({ province, type }).unwrap();
+      // preferCacheValue false: the refresh button must always hit the server
+      const data = await trigger({ province, type }, false).unwrap();
       dispatch(setAllListings(data));
     } catch {
       dispatch(setError('Errore nel caricamento degli annunci'));
+    } finally {
+      dispatch(refreshDone());
     }
   }, [dispatch, trigger, sharedFilters.province, sharedFilters.deal]);
 
+  // Also re-runs when the sidebar's refresh button bumps refreshNonce
   useEffect(() => {
     fetchListings();
-  }, [sharedFilters.province, sharedFilters.deal]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sharedFilters.province, sharedFilters.deal, refreshNonce]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!navigator.geolocation) return;

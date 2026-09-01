@@ -5,7 +5,12 @@ import {
   setSharedFilter,
   resetSharedFilters,
 } from '../../features/shared/filtersSlice';
-import { selectSidebarOpen, closeSidebar } from '../../features/ui/uiSlice';
+import {
+  selectSidebarOpen,
+  closeSidebar,
+  requestRefresh,
+  selectRefreshing,
+} from '../../features/ui/uiSlice';
 import {
   selectUpdatedAtDays,
   type AccessibilityFilter,
@@ -30,7 +35,9 @@ import {
   RangeLabels,
   DateInput,
   ResultsFooter,
+  ResultsRow,
   ResultsCount,
+  RefreshButton,
   Backdrop,
   SidebarCloseBtn,
   MobileResultsBtn,
@@ -72,6 +79,7 @@ export default function FilterSidebar({ count }: FilterSidebarProps) {
   const filters = useAppSelector(selectSharedFilters);
   const days = useAppSelector(selectUpdatedAtDays);
   const open = useAppSelector(selectSidebarOpen);
+  const refreshing = useAppSelector(selectRefreshing);
   const close = () => dispatch(closeSidebar());
 
   // Index-based slider over the distinct days present in the data (data-density
@@ -309,7 +317,35 @@ export default function FilterSidebar({ count }: FilterSidebarProps) {
       )}
 
       <ResultsFooter>
-        <ResultsCount>{count}</ResultsCount> risultati
+        <ResultsRow>
+          <span>
+            <ResultsCount>{count}</ResultsCount> risultati
+          </span>
+          <RefreshButton
+            type="button"
+            $spinning={refreshing}
+            disabled={refreshing}
+            onClick={() => dispatch(requestRefresh())}
+            title="Aggiorna risultati"
+            aria-label="Aggiorna risultati"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M20 11a8 8 0 1 0-.6 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <path
+                d="M20 4v7h-7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </RefreshButton>
+        </ResultsRow>
         <MobileResultsBtn type="button" onClick={close}>
           Vedi {count} risultati
         </MobileResultsBtn>

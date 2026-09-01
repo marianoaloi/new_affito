@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { keyframes } from '@emotion/react';
 
 /** Single source of truth for the mobile breakpoint (px). */
 export const MOBILE_BP = 768;
@@ -243,4 +244,56 @@ export const ResultsCount = styled.span`
   color: var(--text);
   font-weight: 500;
   font-size: 16px;
+`;
+
+export const ResultsRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+`;
+
+const spin = keyframes`
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+export const RefreshButton = styled.button<{ $spinning: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+  color: #28528c;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover:not(:disabled) {
+    background: #f1f2ee;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: var(--muted);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #28528c;
+    outline-offset: 2px;
+  }
+
+  svg {
+    animation: ${({ $spinning }) => ($spinning ? `${spin} 0.8s linear infinite` : 'none')};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    svg {
+      animation: none;
+    }
+  }
 `;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setPage,
@@ -16,7 +16,12 @@ import {
   useUpdateStateMutation,
 } from '../features/listings/listingsApi';
 import { recordStateUpdate, selectDecision } from '../features/decisions/decisionsSlice';
-import { addToast, setListingsCount } from '../features/ui/uiSlice';
+import {
+  addToast,
+  setListingsCount,
+  refreshDone,
+  selectRefreshNonce,
+} from '../features/ui/uiSlice';
 import BulkActionBar from '../components/listings/BulkActionBar';
 import DescriptionModal from '../components/listings/DescriptionModal';
 import ListingDetailModal from '../components/listings/ListingDetailModal';
@@ -400,6 +405,18 @@ export default function TabellaPage() {
   useEffect(() => {
     dispatch(setListingsCount(data?.total ?? 0));
   }, [data?.total, dispatch]);
+
+  // Sidebar refresh button: re-run the listings query, skipping the cache.
+  // The first run is the mount itself, which useGetListingsQuery already covers.
+  const refreshNonce = useAppSelector(selectRefreshNonce);
+  const skipFirstRefresh = useRef(true);
+  useEffect(() => {
+    if (skipFirstRefresh.current) {
+      skipFirstRefresh.current = false;
+      return;
+    }
+    void refetch().finally(() => dispatch(refreshDone()));
+  }, [refreshNonce]); // eslint-disable-line react-hooks/exhaustive-deps
   const totalPages = data?.pages ?? 1;
   const currentPage = data?.page ?? page;
 

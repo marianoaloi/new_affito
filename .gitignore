@@ -79,3 +79,7 @@ functions/lib/**
 dist/**
 functions/**.pem
 .env.**
+.swarm/**
+agentdb.rvf
+ruvector.db
+agentdb.rvf.lock

@@ -11,8 +11,12 @@ router.get('/raw', async (_req: AuthRequest, res: Response): Promise<void> => {
     const db = await getDb();
     const docs = await db.collection('statistic').find({}).toArray();
     res.json(docs);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch raw statistic' });
+  } catch (err ) {
+    const errorMSG : any = { error: 'Failed to fetch raw statistic'  }
+    if(_req.host.includes("192.168.1") || _req.host.includes("localhost")){
+      errorMSG["stak"] = err
+    }
+    res.status(500).json(errorMSG);
   }
 });
 

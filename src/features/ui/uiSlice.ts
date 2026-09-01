@@ -12,6 +12,10 @@ interface UiState {
   modal: string | null;
   listingsCount: number;
   sidebarOpen: boolean;
+  /** Bumped by the sidebar's refresh button; the mounted page re-runs its query on change. */
+  refreshNonce: number;
+  /** True from the refresh request until the mounted page reports its query settled. */
+  refreshing: boolean;
 }
 
 const initialState: UiState = {
@@ -19,6 +23,8 @@ const initialState: UiState = {
   modal: null,
   listingsCount: 0,
   sidebarOpen: false,
+  refreshNonce: 0,
+  refreshing: false,
 };
 
 let toastCounter = 0;
@@ -49,14 +55,32 @@ const uiSlice = createSlice({
     closeSidebar(state) {
       state.sidebarOpen = false;
     },
+    requestRefresh(state) {
+      state.refreshNonce += 1;
+      state.refreshing = true;
+    },
+    refreshDone(state) {
+      state.refreshing = false;
+    },
   },
 });
 
-export const { addToast, removeToast, openModal, closeModal, setListingsCount, toggleSidebar, closeSidebar } =
-  uiSlice.actions;
+export const {
+  addToast,
+  removeToast,
+  openModal,
+  closeModal,
+  setListingsCount,
+  toggleSidebar,
+  closeSidebar,
+  requestRefresh,
+  refreshDone,
+} = uiSlice.actions;
 export default uiSlice.reducer;
 
 export const selectToasts = (state: RootState): Toast[] => state.ui.toasts;
 export const selectModal = (state: RootState): string | null => state.ui.modal;
 export const selectListingsCount = (state: RootState): number => state.ui.listingsCount;
 export const selectSidebarOpen = (state: RootState): boolean => state.ui.sidebarOpen;
+export const selectRefreshNonce = (state: RootState): number => state.ui.refreshNonce;
+export const selectRefreshing = (state: RootState): boolean => state.ui.refreshing;
