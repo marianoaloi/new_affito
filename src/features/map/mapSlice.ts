@@ -87,6 +87,7 @@ interface SharedFilterSubset {
   updFrom: number;
   updTo: number;
   buonoPlus: boolean;
+  id: string;
 }
 
 export function selectFilteredListings(state: {
@@ -95,7 +96,10 @@ export function selectFilteredListings(state: {
 }): MapListingDTO[] {
   const { allListings } = state.map;
   const f = state.sharedFilters;
+  const idTerm = f.id.trim();
   return allListings.filter((l) => {
+    // id is a targeted lookup: it narrows everything, including buono++ overrides
+    if (idTerm !== '' && !String(l.id).includes(idTerm)) return false;
     // buono++ is a priority override: when the checkbox is on, a followed
     // listing is always shown regardless of the other client-side filters
     // (province/type stay applied server-side, scoping the fetch).

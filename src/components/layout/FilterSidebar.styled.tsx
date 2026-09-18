@@ -241,6 +241,10 @@ export const DateInput = styled.input`
   }
 `;
 
+export const IdInput = styled(DateInput)`
+  width: 100%;
+`;
+
 export const ResultsFooter = styled.div`
   margin-top: auto;
   padding-top: 16px;

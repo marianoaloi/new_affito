@@ -388,7 +388,8 @@ export default function TabellaPage() {
 
   const { data, isLoading, isFetching, isError, refetch } = useGetListingsQuery(query);
 
-  // updatedAt range: redux-only filtering — the tabella DTO has no updatedAt,
+  // id + updatedAt range: redux-only filtering, applied to the page already
+  // fetched (no new backend query). The tabella DTO has no updatedAt,
   // so rows are matched by id against the map listings already in the store.
   // Rows whose updatedAt is unknown stay visible.
   const mapListings = useAppSelector(selectAllListings);
@@ -399,21 +400,24 @@ export default function TabellaPage() {
   }, [mapListings]);
 
   const { updFrom, updTo } = sharedFilters;
+  const idTerm = sharedFilters.id.trim();
   const rows = useMemo(() => {
     const all = data?.data ?? [];
-    if (updFrom <= 0 && updTo <= 0) return all;
+    if (idTerm === '' && updFrom <= 0 && updTo <= 0) return all;
     return all.filter((r) => {
+      if (idTerm !== '' && !String(r.id).includes(idTerm)) return false;
       const upd = updById.get(r.id);
       if (upd == null) return true;
       if (updFrom > 0 && upd < updFrom) return false;
       if (updTo > 0 && upd > updTo) return false;
       return true;
     });
-  }, [data?.data, updFrom, updTo, updById]);
+  }, [data?.data, idTerm, updFrom, updTo, updById]);
 
+  // With an id filter the server total is meaningless; report the visible rows.
   useEffect(() => {
-    dispatch(setListingsCount(data?.total ?? 0));
-  }, [data?.total, dispatch]);
+    dispatch(setListingsCount(idTerm !== '' ? rows.length : data?.total ?? 0));
+  }, [data?.total, idTerm, rows.length, dispatch]);
 
   // Sidebar refresh button: re-run the listings query, skipping the cache.
   // The first run is the mount itself, which useGetListingsQuery already covers.

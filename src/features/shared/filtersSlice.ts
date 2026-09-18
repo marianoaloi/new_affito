@@ -17,6 +17,8 @@ export interface SharedFilters {
   updTo: number;
   /** When true, listings marked "buono++" (followed) are always shown regardless of the other filters. */
   buonoPlus: boolean;
+  /** Listing id filter (substring match on the numeric id); '' = inactive. Client-side only. */
+  id: string;
   /** Last map viewport, persisted so panning/zooming survives re-renders and reloads. */
   mapLat: number;
   mapLng: number;
@@ -37,6 +39,7 @@ const initialFilters: SharedFilters = {
   updFrom: 0,
   updTo: 0,
   buonoPlus: false,
+  id: '',
   mapLat: 0,
   mapLng: 0,
   mapZoom: 0,

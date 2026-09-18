@@ -36,6 +36,7 @@ import {
   RangeInput,
   RangeLabels,
   DateInput,
+  IdInput,
   ResultsFooter,
   ResultsRow,
   ResultsCount,
@@ -193,6 +194,20 @@ export default function FilterSidebar({ count }: FilterSidebarProps) {
             Vendita
           </SegmentBtn>
         </SegmentedGroup>
+      </Section>
+
+      <Section>
+        <SectionLabel>ID annuncio / Listing ID</SectionLabel>
+        <IdInput
+          type="text"
+          inputMode="numeric"
+          placeholder="es. 123456789"
+          value={filters.id}
+          onChange={(e) =>
+            dispatch(setSharedFilter({ key: 'id', value: e.target.value.replace(/\D/g, '') }))
+          }
+          aria-label="Filtra per ID annuncio"
+        />
       </Section>
 
       <Section>
