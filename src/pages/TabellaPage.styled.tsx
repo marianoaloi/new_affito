@@ -115,9 +115,10 @@ export const ClassicGrid = styled.div`
   }
 `;
 
-export const ClassicCard = styled.div`
+export const ClassicCard = styled.div<{ $followed?: boolean }>`
   background: #fff;
-  border: 1px solid #e7e7e2;
+  border: 1px solid ${({ $followed }) => ($followed ? '#3182ce' : '#e7e7e2')};
+  border-left: ${({ $followed }) => ($followed ? '4px solid #3182ce' : '1px solid #e7e7e2')};
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -217,9 +218,10 @@ export const HorizGrid = styled.div`
   }
 `;
 
-export const HorizCard = styled.div`
+export const HorizCard = styled.div<{ $followed?: boolean }>`
   background: #fff;
-  border: 1px solid #e7e7e2;
+  border: 1px solid ${({ $followed }) => ($followed ? '#3182ce' : '#e7e7e2')};
+  border-left: ${({ $followed }) => ($followed ? '4px solid #3182ce' : '1px solid #e7e7e2')};
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -281,11 +283,12 @@ export const CompactRow = styled.div`
   }
 `;
 
-export const AccentBar = styled.div<{ $sale: boolean }>`
+export const AccentBar = styled.div<{ $sale: boolean; $followed?: boolean }>`
   width: 4px;
   align-self: stretch;
   border-radius: 3px;
-  background: ${({ $sale }) => ($sale ? 'var(--sale, #A9683A)' : 'var(--primary, #28528C)')};
+  background: ${({ $sale, $followed }) =>
+    $followed ? '#3182ce' : $sale ? 'var(--sale, #A9683A)' : 'var(--primary, #28528C)'};
 `;
 
 export const CompactBadge = styled.div`
@@ -348,6 +351,36 @@ export const CardActions = styled.div`
 
 export const SelectCheck = styled.input`
   cursor: pointer;
+`;
+
+export const BtnBlue = styled.button`
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #3182ce;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  line-height: 1;
+  background: #3182ce;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+export const FollowedBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #ebf4fb;
+  color: #3182ce;
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 700;
 `;
 
 /* EMPTY */

@@ -4,6 +4,7 @@ import type { StateMaloi } from '../../types';
 
 export interface Decision {
   stateMaloi?: StateMaloi;
+  followed?: boolean;
   description?: string;
   updatedAt: number;
 }
@@ -16,9 +17,17 @@ const decisionsSlice = createSlice({
   name: 'decisions',
   initialState,
   reducers: {
-    recordStateUpdate(state, action: PayloadAction<{ id: number; stateMaloi: StateMaloi }>) {
-      const { id, stateMaloi } = action.payload;
-      state[id] = { ...state[id], stateMaloi, updatedAt: Date.now() };
+    recordStateUpdate(
+      state,
+      action: PayloadAction<{ id: number; stateMaloi: StateMaloi; followed?: boolean }>
+    ) {
+      const { id, stateMaloi, followed } = action.payload;
+      state[id] = {
+        ...state[id],
+        stateMaloi,
+        followed: followed === true,
+        updatedAt: Date.now(),
+      };
     },
     recordDescriptionUpdate(
       state,

@@ -105,20 +105,23 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
   const [showPhotoGrid, setShowPhotoGrid] = useState(false);
   const [note, setNote] = useState<string | undefined>(undefined);
   const [localState, setLocalState] = useState<StateMaloi | undefined>(undefined);
+  const [localFollowed, setLocalFollowed] = useState<boolean | undefined>(undefined);
 
   const description = note ?? data?.description ?? '';
   const stateMaloi = (localState !== undefined ? localState : data?.stateMaloi) ?? NO_CHOICE_STATE;
+  const followed = localFollowed !== undefined ? localFollowed : data?.followed ?? false;
 
   const photos = data?.photos ?? [];
   const photo = photos[photoIdx];
   const isSale = data?.type === 'Compra';
   const features = data ? buildFeatures(data) : [];
 
-  const handleState = async (s: StateMaloi) => {
+  const handleState = async (s: StateMaloi, followedNext = false) => {
     setLocalState(s);
-    dispatch(recordStateUpdate({ id: listingId, stateMaloi: s }));
+    setLocalFollowed(followedNext);
+    dispatch(recordStateUpdate({ id: listingId, stateMaloi: s, followed: followedNext }));
     try {
-      await updateState({ id: listingId, stateMaloi: s }).unwrap();
+      await updateState({ id: listingId, stateMaloi: s, followed: followedNext }).unwrap();
       dispatch(addToast({ message: 'Stato aggiornato', type: 'success' }));
     } catch {
       dispatch(addToast({ message: 'Errore aggiornamento stato', type: 'error' }));
@@ -188,6 +191,7 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
               <PriceRow>
                 <DealBadge $sale={isSale}>{isSale ? 'Vendita' : 'Affitto'}</DealBadge>
                 <StateBadge $state={stateMaloi}>{STATE_LABELS[stateMaloi]}</StateBadge>
+                {followed && <StateBadge $state={1} style={{ color: '#3182ce', background: '#EBF4FB' }}>★ buono++</StateBadge>}
                 <ImmoLink href={`https://www.immobiliare.it/annunci/${listingId}`} target="_blank" rel="noopener noreferrer">
                   Immobiliare.it ↗
                 </ImmoLink>
@@ -309,9 +313,10 @@ export default function ListingDetailModal({ listingId, onClose }: Props) {
                   <Divider />
                   <SectionTitle>Valutazione</SectionTitle>
                   <ActionRow>
-                    <ActionBtn $color="#16a34a" $active={stateMaloi === 1} disabled={savingState} onClick={() => void handleState(1)}>✓ Buono</ActionBtn>
+                    <ActionBtn $color="#16a34a" $active={stateMaloi === 1 && !followed} disabled={savingState} onClick={() => void handleState(1)}>✓ Buono</ActionBtn>
                     <ActionBtn $color="#ca8a04" $active={stateMaloi === 2} disabled={savingState} onClick={() => void handleState(2)}>~ Così così</ActionBtn>
                     <ActionBtn $color="#dc2626" $active={stateMaloi === 0} disabled={savingState} onClick={() => void handleState(0)}>✕ Non buono</ActionBtn>
+                    <ActionBtn $color="#3182ce" $active={followed} disabled={savingState} onClick={() => void handleState(1, true)}>★ Buono++</ActionBtn>
                   </ActionRow>
                 </>
               )}

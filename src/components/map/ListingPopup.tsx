@@ -39,11 +39,11 @@ export default function ListingPopup({ listing, onClose, onOpenDetail }: Listing
     );
   }
 
-  async function setState(stateMaloi: StateMaloi) {
+  async function setState(stateMaloi: StateMaloi, followed = false) {
     try {
-      await updateState({ id: listing.id, stateMaloi }).unwrap();
-      dispatch(recordStateUpdate({ id: listing.id, stateMaloi }));
-      dispatch(updateListingStateMaloi({ id: listing.id, stateMaloi }));
+      await updateState({ id: listing.id, stateMaloi, followed }).unwrap();
+      dispatch(recordStateUpdate({ id: listing.id, stateMaloi, followed }));
+      dispatch(updateListingStateMaloi({ id: listing.id, stateMaloi, followed }));
       dispatch(addToast({ message: 'Stato aggiornato', type: 'success' }));
       map.closePopup();
       onClose();
@@ -61,6 +61,11 @@ export default function ListingPopup({ listing, onClose, onOpenDetail }: Listing
   return (
     <div className="popup-content">
       <h3>
+        {listing.followed === true && (
+          <span title="buono++" style={{ color: '#3182ce' }}>
+            ★{' '}
+          </span>
+        )}
         <a
           href={`https://www.immobiliare.it/annunci/${listing.id}`}
           target="_blank"
@@ -129,10 +134,19 @@ export default function ListingPopup({ listing, onClose, onOpenDetail }: Listing
             Buono 🟢
           </button>
           <button className="btn-sm" disabled={isLoading} onClick={() => setState(2)}>
-            Così così 🟡
+            Così  🟡
           </button>
           <button className="btn-sm" disabled={isLoading} onClick={() => setState(0)}>
-            Non buono 🔴
+            Non  🔴
+          </button>
+          <button
+            className="btn-sm"
+            disabled={isLoading}
+            title="Buono++ (seguito)"
+            style={{ color: '#3182ce', fontWeight: 600 }}
+            onClick={() => setState(1, true)}
+          >
+            Buo++ ★
           </button>
         </div>
       )}

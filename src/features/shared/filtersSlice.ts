@@ -15,6 +15,13 @@ export interface SharedFilters {
   /** updatedAt range (unix seconds); 0 = handle at the slider's end, filter inactive */
   updFrom: number;
   updTo: number;
+  /** When true, listings marked "buono++" (followed) are always shown regardless of the other filters. */
+  buonoPlus: boolean;
+  /** Last map viewport, persisted so panning/zooming survives re-renders and reloads. */
+  mapLat: number;
+  mapLng: number;
+  /** 0 = never panned yet; the province default center is used instead. */
+  mapZoom: number;
 }
 
 const initialFilters: SharedFilters = {
@@ -29,6 +36,10 @@ const initialFilters: SharedFilters = {
   stateMaloi: '',
   updFrom: 0,
   updTo: 0,
+  buonoPlus: false,
+  mapLat: 0,
+  mapLng: 0,
+  mapZoom: 0,
 };
 
 const STORAGE_KEY = 'affito.sharedFilters';
@@ -70,13 +81,18 @@ const sharedFiltersSlice = createSlice({
     ) {
       state[action.payload.key] = action.payload.value;
     },
+    setMapView(state, action: PayloadAction<{ lat: number; lng: number; zoom: number }>) {
+      state.mapLat = action.payload.lat;
+      state.mapLng = action.payload.lng;
+      state.mapZoom = action.payload.zoom;
+    },
     resetSharedFilters() {
       return initialFilters;
     },
   },
 });
 
-export const { setSharedFilter, resetSharedFilters } = sharedFiltersSlice.actions;
+export const { setSharedFilter, setMapView, resetSharedFilters } = sharedFiltersSlice.actions;
 
 export const selectSharedFilters = (state: RootState) => state.sharedFilters;
 

@@ -28,6 +28,8 @@ import {
   SegmentBtn,
   SidebarSelect,
   CheckboxLabel,
+  BuonoPlusLabel,
+  BuonoPlusStar,
   RangeWrap,
   RangeTrack,
   RangeFill,
@@ -245,6 +247,17 @@ export default function FilterSidebar({ count }: FilterSidebarProps) {
           />
           Solo piano terra (piano T)
         </CheckboxLabel>
+        <BuonoPlusLabel>
+          <input
+            type="checkbox"
+            checked={filters.buonoPlus}
+            onChange={(e) =>
+              dispatch(setSharedFilter({ key: 'buonoPlus', value: e.target.checked }))
+            }
+          />
+          <BuonoPlusStar aria-hidden="true">★</BuonoPlusStar>
+          Mostra sempre buono++
+        </BuonoPlusLabel>
       </Section>
 
       <Section>

@@ -256,7 +256,7 @@ textarea:focus {
 .popup-field { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; font-size: 0.85rem; }
 .popup-field label { color: var(--muted); }
 .popup-actions { display: flex; gap: 8px; margin: 8px 0; }
-.popup-state-btns { display: flex; gap: 6px; margin: 8px 0; }
+.popup-state-btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
 
 /* Photos */
 .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }

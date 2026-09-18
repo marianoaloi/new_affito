@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { useLazyGetMapListingsQuery } from '../features/map/mapApi';
 import {
@@ -9,7 +9,7 @@ import {
   selectMapLoading,
   selectMapError,
 } from '../features/map/mapSlice';
-import { selectSharedFilters } from '../features/shared/filtersSlice';
+import { selectSharedFilters, setMapView } from '../features/shared/filtersSlice';
 import { refreshDone, selectRefreshNonce } from '../features/ui/uiSlice';
 import MapView from '../components/map/MapView';
 import ListingDetailModal from '../components/listings/ListingDetailModal';
@@ -66,19 +66,40 @@ export default function MapPage() {
     );
   }, []);
 
-  const center = useMemo(() => {
+  // A saved viewport wins over the province default, so the position and zoom
+  // survive re-renders, refetches and reloads. mapZoom 0 = never panned yet.
+  const { mapLat, mapLng, mapZoom } = sharedFilters;
+  const view = useMemo(() => {
+    if (mapZoom > 0) return { lat: mapLat, lng: mapLng, zoom: mapZoom };
     return PROVINCE_CENTERS[sharedFilters.province] ?? PROVINCE_CENTERS.Udine;
-  }, [sharedFilters.province]);
+  }, [mapLat, mapLng, mapZoom, sharedFilters.province]);
+
+  // Changing city is the one case that should override a saved viewport.
+  const prevProvince = useRef(sharedFilters.province);
+  useEffect(() => {
+    if (prevProvince.current === sharedFilters.province) return;
+    prevProvince.current = sharedFilters.province;
+    const c = PROVINCE_CENTERS[sharedFilters.province] ?? PROVINCE_CENTERS.Udine;
+    dispatch(setMapView({ lat: c.lat, lng: c.lng, zoom: c.zoom }));
+  }, [sharedFilters.province, dispatch]);
+
+  const onViewChange = useCallback(
+    (lat: number, lng: number, zoom: number) => {
+      dispatch(setMapView({ lat, lng, zoom }));
+    },
+    [dispatch]
+  );
 
   return (
     <MapPageWrapper>
       <MapContainer>
         <MapView
           listings={filteredListings}
-          center={[center.lat, center.lng]}
-          zoom={center.zoom}
+          center={[view.lat, view.lng]}
+          zoom={view.zoom}
           myLocation={myLocation}
           onOpenDetail={setDetailId}
+          onViewChange={onViewChange}
         />
       </MapContainer>
 

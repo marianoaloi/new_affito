@@ -61,10 +61,13 @@ const mapSlice = createSlice({
     },
     updateListingStateMaloi(
       state,
-      action: PayloadAction<{ id: number; stateMaloi: 0 | 1 | 2 }>
+      action: PayloadAction<{ id: number; stateMaloi: 0 | 1 | 2; followed?: boolean }>
     ) {
       const listing = state.allListings.find((l) => l.id === action.payload.id);
-      if (listing) listing.stateMaloi = action.payload.stateMaloi;
+      if (listing) {
+        listing.stateMaloi = action.payload.stateMaloi;
+        listing.followed = action.payload.followed === true;
+      }
     },
   },
 });
@@ -83,6 +86,7 @@ interface SharedFilterSubset {
   terra: boolean;
   updFrom: number;
   updTo: number;
+  buonoPlus: boolean;
 }
 
 export function selectFilteredListings(state: {
@@ -92,6 +96,10 @@ export function selectFilteredListings(state: {
   const { allListings } = state.map;
   const f = state.sharedFilters;
   return allListings.filter((l) => {
+    // buono++ is a priority override: when the checkbox is on, a followed
+    // listing is always shown regardless of the other client-side filters
+    // (province/type stay applied server-side, scoping the fetch).
+    if (f.buonoPlus && l.followed === true) return true;
     if (f.stateMaloi !== '') {
       if (f.stateMaloi === 'empty') {
         if (l.stateMaloi != null) return false;

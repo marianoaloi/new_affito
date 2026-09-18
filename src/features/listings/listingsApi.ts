@@ -19,11 +19,14 @@ export const listingsApi = baseApi.injectEndpoints({
     getListingById: builder.query<ListingDetailDTO, number>({
       query: (id) => ({ url: `listings/${id}` }),
     }),
-    updateState: builder.mutation<MutationResult, { id: number; stateMaloi: StateMaloi }>({
-      query: ({ id, stateMaloi }) => ({
+    updateState: builder.mutation<
+      MutationResult,
+      { id: number; stateMaloi: StateMaloi; followed?: boolean }
+    >({
+      query: ({ id, stateMaloi, followed }) => ({
         url: `listings/${id}/state`,
         method: 'PATCH',
-        body: { stateMaloi },
+        body: { stateMaloi, followed },
       }),
       invalidatesTags: ['Listings'],
     }),

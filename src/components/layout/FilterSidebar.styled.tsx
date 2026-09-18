@@ -147,6 +147,16 @@ export const CheckboxLabel = styled.label`
   cursor: pointer;
 `;
 
+export const BuonoPlusLabel = styled(CheckboxLabel)`
+  margin-top: 8px;
+`;
+
+export const BuonoPlusStar = styled.span`
+  color: #3182ce;
+  font-size: 15px;
+  line-height: 1;
+`;
+
 /* Double-handle range slider: two overlapping native ranges on one track */
 export const RangeWrap = styled.div`
   position: relative;

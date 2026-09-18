@@ -71,6 +71,8 @@ import {
   EmptyState,
   Pagination,
   SkeletonCard,
+  BtnBlue,
+  FollowedBadge,
 } from './TabellaPage.styled';
 
 type CardStyle = 'classic' | 'horiz' | 'compact';
@@ -139,13 +141,14 @@ function useCardControls({ listing, onEditDescription, onOpenDetail }: Omit<Card
   const [updateState, { isLoading }] = useUpdateStateMutation();
 
   const stateMaloi = decision?.stateMaloi ?? listing.stateMaloi;
+  const followed = decision?.followed ?? listing.followed ?? false;
   const description = decision?.description ?? listing.description ?? '';
   const checked = selectedIds.includes(listing.id);
 
-  const setState = async (next: StateMaloi) => {
-    dispatch(recordStateUpdate({ id: listing.id, stateMaloi: next }));
+  const setState = async (next: StateMaloi, followedNext = false) => {
+    dispatch(recordStateUpdate({ id: listing.id, stateMaloi: next, followed: followedNext }));
     try {
-      await updateState({ id: listing.id, stateMaloi: next }).unwrap();
+      await updateState({ id: listing.id, stateMaloi: next, followed: followedNext }).unwrap();
       dispatch(addToast({ message: 'Stato aggiornato', type: 'success' }));
     } catch {
       dispatch(addToast({ message: 'Errore aggiornamento stato', type: 'error' }));
@@ -156,7 +159,7 @@ function useCardControls({ listing, onEditDescription, onOpenDetail }: Omit<Card
   const edit = () => onEditDescription(listing.id, description);
   const openDetail = () => onOpenDetail(listing);
 
-  return { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail };
+  return { stateMaloi, followed, checked, isLoading, setState, toggle, edit, openDetail };
 }
 
 function CardActionButtons({
@@ -165,7 +168,7 @@ function CardActionButtons({
   edit,
 }: {
   isLoading: boolean;
-  setState: (s: StateMaloi) => void;
+  setState: (s: StateMaloi, followed?: boolean) => void;
   edit: () => void;
 }) {
   const isAdmin = useAppSelector(selectIsAdmin);
@@ -182,6 +185,9 @@ function CardActionButtons({
           <button className="btn-sm btn-yellow" disabled={isLoading} onClick={() => setState(2)} title="Così così">
             ~
           </button>
+          <BtnBlue disabled={isLoading} onClick={() => setState(1, true)} title="Buono++ (seguito)">
+            ★
+          </BtnBlue>
         </>
       )}
       <button className="btn-sm btn-secondary" onClick={edit} title="Modifica descrizione">
@@ -192,7 +198,7 @@ function CardActionButtons({
 }
 
 function ClassicListingCard({ listing, onEditDescription, onOpenDetail, onOpenPhotos }: CardControlsProps) {
-  const { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
+  const { stateMaloi, followed, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
     listing,
     onEditDescription,
     onOpenDetail,
@@ -202,7 +208,7 @@ function ClassicListingCard({ listing, onEditDescription, onOpenDetail, onOpenPh
   const accessibility = getAccessibilityIcon(listing);
 
   return (
-    <ClassicCard>
+    <ClassicCard $followed={followed}>
       <CardImg
         $url={listing.photo?.urls.small}
         onClick={listing.photo ? () => onOpenPhotos(listing) : undefined}
@@ -234,6 +240,7 @@ function ClassicListingCard({ listing, onEditDescription, onOpenDetail, onOpenPh
         </ChipRow>
         <ChipRow>
           <StateBadge state={stateMaloi} />
+          {followed && <FollowedBadge>★ buono++</FollowedBadge>}
           <label>
             <SelectCheck
               type="checkbox"
@@ -243,14 +250,14 @@ function ClassicListingCard({ listing, onEditDescription, onOpenDetail, onOpenPh
             />
           </label>
         </ChipRow>
-        <CardActionButtons isLoading={isLoading} setState={(s) => void setState(s)} edit={edit} />
+        <CardActionButtons isLoading={isLoading} setState={(s, f) => void setState(s, f)} edit={edit} />
       </CardBody>
     </ClassicCard>
   );
 }
 
 function HorizListingCard({ listing, onEditDescription, onOpenDetail, onOpenPhotos }: CardControlsProps) {
-  const { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
+  const { stateMaloi, followed, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
     listing,
     onEditDescription,
     onOpenDetail,
@@ -260,7 +267,7 @@ function HorizListingCard({ listing, onEditDescription, onOpenDetail, onOpenPhot
   const accessibility = getAccessibilityIcon(listing);
 
   return (
-    <HorizCard>
+    <HorizCard $followed={followed}>
       <HorizImg
         $url={listing.photo?.urls.small}
         onClick={listing.photo ? () => onOpenPhotos(listing) : undefined}
@@ -292,6 +299,7 @@ function HorizListingCard({ listing, onEditDescription, onOpenDetail, onOpenPhot
         </ChipRow>
         <ChipRow>
           <StateBadge state={stateMaloi} />
+          {followed && <FollowedBadge>★ buono++</FollowedBadge>}
           <label>
             <SelectCheck
               type="checkbox"
@@ -301,14 +309,14 @@ function HorizListingCard({ listing, onEditDescription, onOpenDetail, onOpenPhot
             />
           </label>
         </ChipRow>
-        <CardActionButtons isLoading={isLoading} setState={(s) => void setState(s)} edit={edit} />
+        <CardActionButtons isLoading={isLoading} setState={(s, f) => void setState(s, f)} edit={edit} />
       </HorizBody>
     </HorizCard>
   );
 }
 
 function CompactListingRow({ listing, onEditDescription, onOpenDetail }: CardControlsProps) {
-  const { stateMaloi, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
+  const { stateMaloi, followed, checked, isLoading, setState, toggle, edit, openDetail } = useCardControls({
     listing,
     onEditDescription,
     onOpenDetail,
@@ -318,7 +326,7 @@ function CompactListingRow({ listing, onEditDescription, onOpenDetail }: CardCon
 
   return (
     <CompactRow>
-      <AccentBar $sale={sale} />
+      <AccentBar $sale={sale} $followed={followed} />
       <SelectCheck
         type="checkbox"
         checked={checked}
@@ -338,7 +346,8 @@ function CompactListingRow({ listing, onEditDescription, onOpenDetail }: CardCon
       <CompactSpecs>{specsText(listing)}</CompactSpecs>
       <Chip>{accessibility.icon} {accessibility.label}</Chip>
       <StateBadge state={stateMaloi} />
-      <CardActionButtons isLoading={isLoading} setState={(s) => void setState(s)} edit={edit} />
+      {followed && <FollowedBadge>★ buono++</FollowedBadge>}
+      <CardActionButtons isLoading={isLoading} setState={(s, f) => void setState(s, f)} edit={edit} />
       <a
         href={`https://www.immobiliare.it/annunci/${listing.id}`}
         target="_blank"

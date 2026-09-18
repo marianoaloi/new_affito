@@ -15,6 +15,7 @@ const PROJECTION = {
   type: 1,
   description: 1,
   stateMaloi: 1,
+  followed: 1,
   mLastUpdate: 1,
   elevation: 1,
   'feature.province': 1,
@@ -50,6 +51,7 @@ function toDTO(doc: Document): ListingDTO {
     province: doc.feature?.province ?? '',
     type: mapType(doc.feature?.type ?? doc.type ?? ''),
     stateMaloi: doc.stateMaloi,
+    followed: doc.followed === true,
     description: doc.description,
     mLastUpdate: doc.mLastUpdate,
     floor: doc.properties?.floor
@@ -158,7 +160,7 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
       { _id: id as unknown as Document['_id'] },
       {
         projection: {
-          _id: 1, type: 1, description: 1, stateMaloi: 1, mLastUpdate: 1,
+          _id: 1, type: 1, description: 1, stateMaloi: 1, followed: 1, mLastUpdate: 1,
           // feature
           'feature.province': 1, 'feature.type': 1,
           'feature.featureList': 1,
@@ -286,9 +288,13 @@ router.patch('/:id/state', requireAdmin, async (req: AuthRequest, res: Response)
       res.status(400).json({ error: 'Invalid id' });
       return;
     }
-    const { stateMaloi } = req.body ?? {};
+    const { stateMaloi, followed } = req.body ?? {};
     if (!isValidState(stateMaloi)) {
       res.status(400).json({ error: 'stateMaloi must be 0, 1, or 2' });
+      return;
+    }
+    if (followed === true && stateMaloi !== 1) {
+      res.status(400).json({ error: 'followed requires stateMaloi 1' });
       return;
     }
 
@@ -298,6 +304,7 @@ router.patch('/:id/state', requireAdmin, async (req: AuthRequest, res: Response)
       {
         $set: {
           stateMaloi,
+          followed: followed === true,
           mLastUpdate: Date.now() / 1000,
           userUpdate: req.user?.email,
         },
@@ -364,6 +371,7 @@ router.post('/bulk-state', requireAdmin, async (req: AuthRequest, res: Response)
       {
         $set: {
           stateMaloi,
+          followed: false,
           mLastUpdate: Date.now() / 1000,
           userUpdate: req.user?.email,
         },

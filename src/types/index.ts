@@ -66,6 +66,7 @@ export interface ListingDTO {
   province: string;
   type: string;
   stateMaloi?: StateMaloi;
+  followed?: boolean;
   description?: string;
   mLastUpdate?: number;
   floor?: { abbreviation?: string | null; value?: string };
@@ -194,6 +195,7 @@ export interface MapListingDTO {
   province: string;
   type: string;
   stateMaloi?: 0 | 1 | 2;
+  followed?: boolean;
   description?: string;
   mLastUpdate?: number;
   createdAt: number;
