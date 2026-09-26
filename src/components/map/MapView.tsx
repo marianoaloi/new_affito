@@ -89,6 +89,7 @@ interface MapViewProps {
   zoom: number;
   myLocation: GeolocationCoordinates | null;
   onOpenDetail: (id: number) => void;
+  onEditDescription: (id: number, description: string) => void;
   /** Called on pan/zoom end with the live viewport. */
   onViewChange?: (lat: number, lng: number, zoom: number) => void;
 }
@@ -99,6 +100,7 @@ export default function MapView({
   zoom,
   myLocation,
   onOpenDetail,
+  onEditDescription,
   onViewChange,
 }: MapViewProps) {
   return (
@@ -123,7 +125,12 @@ export default function MapView({
             position={[latitude, longitude]}
           >
             <Popup maxWidth={400}>
-              <ListingPopup listing={listing} onClose={() => {}} onOpenDetail={onOpenDetail} />
+              <ListingPopup
+                listing={listing}
+                onClose={() => {}}
+                onOpenDetail={onOpenDetail}
+                onEditDescription={onEditDescription}
+              />
             </Popup>
           </Marker>
         );

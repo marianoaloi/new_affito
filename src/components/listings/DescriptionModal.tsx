@@ -41,7 +41,7 @@ export default function DescriptionModal({
     try {
       await updateDescription({ id: listingId, description: text }).unwrap();
       dispatch(recordDescriptionUpdate({ id: listingId, description: text }));
-      dispatch(addToast({ message: 'Descrizione salvata', type: 'success' }));
+      dispatch(addToast({ message: 'Note salvate', type: 'success' }));
       onClose();
     } catch {
       dispatch(addToast({ message: 'Errore nel salvataggio', type: 'error' }));
@@ -52,12 +52,12 @@ export default function DescriptionModal({
     <ModalOverlay onMouseDown={handleClose}>
       <ModalBox onMouseDown={(e) => e.stopPropagation()}>
         <ModalHeader>
-          <h3>Modifica descrizione</h3>
+          <h3>Note personali</h3>
           <ModalCloseBtn onClick={handleClose} aria-label="Chiudi">
             ×
           </ModalCloseBtn>
         </ModalHeader>
-        <ModalLabel htmlFor="description-text">Descrizione</ModalLabel>
+        <ModalLabel htmlFor="description-text">Note personali</ModalLabel>
         <ModalTextarea
           id="description-text"
           value={text}

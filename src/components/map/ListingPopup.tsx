@@ -2,7 +2,7 @@ import { useMap } from 'react-leaflet';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectIsAdmin } from '../../features/auth/authSlice';
 import { useUpdateStateMutation } from '../../features/listings/listingsApi';
-import { recordStateUpdate } from '../../features/decisions/decisionsSlice';
+import { recordStateUpdate, selectDecision } from '../../features/decisions/decisionsSlice';
 import { updateListingStateMaloi } from '../../features/map/mapSlice';
 import { addToast } from '../../features/ui/uiSlice';
 import type { MapListingDTO, StateMaloi } from '../../types';
@@ -18,12 +18,22 @@ interface ListingPopupProps {
   listing: MapListingDTO;
   onClose: () => void;
   onOpenDetail: (id: number) => void;
+  /** Opens the "Note personali" editor; the popup stays open underneath. */
+  onEditDescription: (id: number, description: string) => void;
 }
 
-export default function ListingPopup({ listing, onClose, onOpenDetail }: ListingPopupProps) {
+export default function ListingPopup({
+  listing,
+  onClose,
+  onOpenDetail,
+  onEditDescription,
+}: ListingPopupProps) {
   const dispatch = useAppDispatch();
   const map = useMap();
   const isAdmin = useAppSelector(selectIsAdmin);
+  const decision = useAppSelector(selectDecision(listing.id));
+  // the session's latest edit wins over the value fetched with the map
+  const description = decision?.description ?? listing.description ?? '';
   const [updateState, { isLoading }] = useUpdateStateMutation();
 
   const { latitude, longitude } = listing.location;
@@ -125,6 +135,14 @@ export default function ListingPopup({ listing, onClose, onOpenDetail }: Listing
         </button>
         <button className="btn-sm" title="Dettagli" onClick={() => onOpenDetail(listing.id)}>
           ℹ️
+        </button>
+        <button
+          className="btn-sm"
+          title="Note personali"
+          aria-label="Modifica note personali"
+          onClick={() => onEditDescription(listing.id, description)}
+        >
+          ✏️
         </button>
       </div>
 

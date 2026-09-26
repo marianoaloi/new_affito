@@ -13,6 +13,7 @@ import { selectSharedFilters, setMapView } from '../features/shared/filtersSlice
 import { refreshDone, selectRefreshNonce } from '../features/ui/uiSlice';
 import MapView from '../components/map/MapView';
 import ListingDetailModal from '../components/listings/ListingDetailModal';
+import DescriptionModal from '../components/listings/DescriptionModal';
 import {
   MapPageWrapper,
   MapContainer,
@@ -34,6 +35,9 @@ export default function MapPage() {
   const error = useAppSelector(selectMapError);
   const [myLocation, setMyLocation] = useState<GeolocationCoordinates | null>(null);
   const [detailId, setDetailId] = useState<number | null>(null);
+  // "Note personali" editor opened from the popup's pencil; the leaflet popup
+  // is untouched, so closing the editor lands back on it.
+  const [note, setNote] = useState<{ id: number; description: string } | null>(null);
   const refreshNonce = useAppSelector(selectRefreshNonce);
 
   const [trigger] = useLazyGetMapListingsQuery();
@@ -99,6 +103,7 @@ export default function MapPage() {
           zoom={view.zoom}
           myLocation={myLocation}
           onOpenDetail={setDetailId}
+          onEditDescription={(id, description) => setNote({ id, description })}
           onViewChange={onViewChange}
         />
       </MapContainer>
@@ -106,6 +111,14 @@ export default function MapPage() {
       {/* Outside MapContainer: its z-index:0 stacking context would trap the modal below the drawer */}
       {detailId !== null && (
         <ListingDetailModal listingId={detailId} onClose={() => setDetailId(null)} />
+      )}
+
+      {note !== null && (
+        <DescriptionModal
+          listingId={note.id}
+          currentDescription={note.description}
+          onClose={() => setNote(null)}
+        />
       )}
 
       {loading && <LoadingOverlay>Caricamento...</LoadingOverlay>}
